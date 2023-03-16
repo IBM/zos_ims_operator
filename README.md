@@ -4,7 +4,7 @@
 The **IBM® IMS Operator collection** provides automation for provisioning IMS on one or more z/OS endpoints and managing its lifecycle in a hybrid Cloud environment.
 
 
-Import this collection into an instance of **z/OS Cloud Broker** running in RedHat OpenShift Container Platform to get started quickly. **z/OS Cloud Broker** generates a Kubernetes operator, making it easy to deploy IMS to a z/OS endpoint. For information, see the [documentation](https://www.ibm.com/docs/SSV97FN_latest/zstack/IMS.html).
+Import this collection into an instance of **z/OS Cloud Broker** running in RedHat OpenShift Container Platform to get started quickly. **z/OS Cloud Broker** generates a Kubernetes operator, making it easy to deploy IMS to a z/OS endpoint. For information, see the [documentation](https://www.ibm.com/docs/SSV97FN_latest/zstack/operators_ims.html).
 
 
 **IBM Z and Cloud Modernization Stack**
