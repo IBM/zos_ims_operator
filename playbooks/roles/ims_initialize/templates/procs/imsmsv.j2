@@ -1,0 +1,22 @@
+//******************************************************************
+//*  IMSMSV Procedure
+//*
+//*  This procedure executes the Multiple Systems Verification
+//*  utility (DFSUMSV0) to verify the consistency and
+//*  compatibility of system definitions for IMS systems
+//*  in a multisystem environment.
+//*
+//******************************************************/
+//* Copyright 2023 IBM Inc. All Rights Reserved.       
+//* SPDX-License-Identifier: Apache-2.0                        
+//******************************************************/
+//*
+//IMSMSV PROC DSN='{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL',
+//            REG=32K,CLASS=A,ALL=ALL,
+//            UNIT=SYSDA,SER=,DSM='{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.MODBLKS'
+//MSVERIFY EXEC PGM=DFSUMSV0,PARM='&ALL',REGION=&REG
+//STEPLIB  DD DSN=&DSM,DISP=SHR,UNIT=&UNIT,
+//         VOL=SER=&SER
+//         DD DSN=&DSN,DISP=SHR,UNIT=&UNIT,
+//         VOL=SER=&SER
+//SYSOUT   DD SYSOUT=&CLASS

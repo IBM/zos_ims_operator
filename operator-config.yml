@@ -1,0 +1,98 @@
+#
+# Copyright 2023 IBM Inc. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+name: zos-ims-operator
+displayName: IBM Z and Cloud Modernization Stack - IMS Operator
+domain: ibm
+version: 1.1.0
+inventoryName: zosendpoint
+description: >- # TODO Can also be a path to a markdown file?
+  # IBM Z and Cloud Modernization Stack - IMS Operator 
+    The **IBM IMS Operator Collection** provides automation around provisioning IMS on to one or more Wazi sandboxes and managing its lifecycle in a hybrid Cloud environment. 
+    The **IBM IMS Operator Collection** is designed to work with Wazi sandboxes that are based on the Extended ADCD image to provide a seamless self-service experience 
+    for the z/OS application developers in a cloud native environment. 
+
+  # Input
+    By working with Wazi sandboxes, the **IBM IMS Operator Collection** already knows about the location of system and IMS resources needed to provision an IMS system 
+    but there are a few required inputs (these must unique among the IMS instances running on the same Wazi sandbox):
+    1. IMSID
+    2. Port numbers for ODBM
+    3. Port numbers for IMS Connect
+    4. IMSPlex name
+
+  # Output
+    A sucessful provision will create an IMS system with the following features:
+    1. Full TMDB environment
+    2. IMSPlex (SCI, OM, RM)
+    3. IMS Connnect
+    4. IMS Open Database (ODBM)
+    5. IMS Catalog
+
+  # Limitations
+    This version of the **IBM IMS Operator Collection** is designed to work only with Waze sandboxes or Extended ADCD with IMS&reg; pre-installed
+
+  # Version
+    Check the [release notes](https://www.ibm.com/docs/SSV97FN_latest/ims-operator/release-notes.html) for the latest information about versions of this Operator collection
+icon:
+  - base64data: >-
+      PHN2ZyBpZD0iSW5mb3JtYXRpb25NYW5hZ2VtZW50U3lzdGVtIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJrN2Iycjk0Zm9hIiB4MT0iMTgiIHkxPSIyNCIgeDI9IjMwIiB5Mj0iMjQiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMxNjE2MTYiIHN0b3Atb3BhY2l0eT0iLjA1Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMTYxNjE2IiBzdG9wLW9wYWNpdHk9Ii4zIi8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9IjZqZXczbWRnamIiIHgxPSIyIiB5MT0iOCIgeDI9IjE0IiB5Mj0iOCIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzE2MTYxNiIgc3RvcC1vcGFjaXR5PSIuMyIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzE2MTYxNiIgc3RvcC1vcGFjaXR5PSIuMDUiLz48L2xpbmVhckdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0iMnN4bWg3YTEzYyIgeDE9IjYiIHkxPSIyNiIgeDI9IjI2IiB5Mj0iNiIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzQzZDFjZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzQxOGJmZiIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxwYXRoIHN0eWxlPSJmaWxsOnVybCgjazdiMnI5NGZvYSkiIGQ9Ik0yNiAxOHY4aC04djRoMTJWMThoLTR6Ii8+PHBhdGggc3R5bGU9ImZpbGw6dXJsKCM2amV3M21kZ2piKSIgZD0iTTYgNmg4VjJIMnYxMmg0VjZ6Ii8+PHBhdGggc3R5bGU9ImZpbGw6dXJsKCMyc3htaDdhMTNjKSIgZD0iTTYgNmgyMHYyMEg2eiIvPjxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjUiIHN0eWxlPSJmaWxsOiMwMDFkNmMiLz48L3N2Zz4=
+    mediatype: image/svg+xml;base64
+resources:
+  - kind: TMDB
+    displayName: 
+    description: Provision an IMS TMDB system on a Wazi sandbox
+    playbook: playbooks/provision-tmdb-wazi.yml
+    finalizer: playbooks/deprovision-tmdb-wazi.yml
+    vars:
+      - name: accept
+        displayName: License
+        type: boolean
+        required: true
+        description: >-
+          IBM Information Management System Operator Collection license agreement must be accepted during installation of this product.
+          Refer to the IBM Z and Cloud Modernization Stack Community page https://ibm.biz/z-modernization-stack-community to read the corresponding license for 
+          the IBM Z and Cloud Modernization Stack - IMS Operator version selected. 
+          I certify that I have read and accept the terms of the IBM® license that covers the deployment of this software.
+      - name: DFS_IMS_SSID
+        displayName: SSID
+        description: The IMSID of this instance (https://ibm.biz/BdPbuM)
+        type: string
+        required: true
+        default: IMWZ
+      - name: ODBM_PORTID
+        displayName: IMS ODBM Port
+        description: IMS Open Database Port (https://ibm.biz/BdPbuS)
+        required: true
+        type: number
+        default: 9800
+      - name: ODBM_SSLPORTID
+        displayName: IMS ODBM TLS Port
+        description: IMS Open Database Secure Port (https://ibm.biz/BdPbuS)
+        required: true
+        type: number
+        default: 9801
+      - name: IMS_CONNECT_PORT
+        displayName: IMS Connect Port
+        description: The IMS Connect Port (https://ibm.biz/BdPbuK)
+        required: true
+        type: number
+        default: 9900
+      - name: IMS_CONNECT_SSLPORT
+        displayName: IMS Connect TLS Port
+        description: The IMS Connect Secure Port (https://ibm.biz/BdPbuK)
+        required: true
+        type: number
+        default: 9901
+      - name: DFS_IMSPlex
+        displayName: IMSPLEX
+        description: The IMSPlex that this IMS instance joins (https://ibm.biz/BdPbua)
+        required: true
+        type: string
+        default: PLXWZ
+      - name: DFS_workingdir
+        displayName: Temporary working directory
+        description: Temporary working directory on USS for the IMS Operator
+        required: true
+        type: string
+        default: '/u/ibmuser'

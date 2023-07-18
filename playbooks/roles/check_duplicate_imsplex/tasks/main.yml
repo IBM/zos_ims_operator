@@ -1,0 +1,67 @@
+---
+#
+# Copyright 2023 IBM Inc. All Rights Reserved
+# SPDX-License-Identifier: Apache-2.0
+#
+# Check if IMS already up
+- name: Check for duplicate IMS
+  collections:
+      - ibm.ibm_zos_core
+      - ibm.ibm_zos_ims
+      
+  block:
+        # IMSPlex already up , instance in 'Success' state, and a reconcile comes in, do nothing, maintain 'Success' status
+        # - name: Check if IMSPLEX {{ DFS_IMSPlex  }} already Up
+        #   ims_command:
+        #       command: QUERY IMSPLEX
+        #       plex:  '{{DFS_IMSPlex}}'
+        #   register: qry_result
+        #   failed_when: qry_result.msg is not defined
+    - name: Check if IMSPLEX {{ DFS_IMSPlex  }} already Up
+      zos_job_query:
+        job_name: "{{DFS_IMS_SSID}}HWS"
+      register: qry_result
+      failed_when: qry_result is not defined
+
+    - block:
+      - name: get active jobname
+        set_fact: 
+          active_hws_jobid: '{{item.job_id}}'
+        when: item.system
+        with_items: '{{qry_result.jobs}}'
+
+      - name: get Job output
+        zos_job_output:
+          job_id: '{{active_hws_jobid}}'
+          ddname: "JESMSGLG"
+        register: hws_job_output
+        when: active_hws_jobid
+
+      - block:
+          - name: IMSPLEX {{DFS_IMSPlex}} already Up
+            debug: ''
+          - meta: end_host
+        when: 
+          - reconcile_run
+          - hws_job_output.jobs is defined
+          - '"IMSPLEX={{DFS_IMSPlex}}" in hws_job_output.jobs[0].ddnames[0].content | join'
+          - tmdb_cr_instance.resources[0].status.run_result is defined and tmdb_cr_instance.resources[0].status.run_result != 'failedDup'
+
+      # when: '"MODULE FAILURE" not in qry_result.msg | join'
+      when: qry_result.module_stderr is not defined
+
+    # IMSPex already up and a new/recon 'Create' comes in, fail it with 'failedDup' status
+    - block: 
+      - name: Update CR instance run status
+        include_role:
+          name: update_instance_status
+        vars:
+          status_val: 'failedDup'
+          status_key: 'run_result'
+          instance_kind: TMDB
+      - fail:
+          msg: Duplicate IMSPlex {{ DFS_IMSPlex }}
+      when: 
+          # - not reconcile_run
+          - hws_job_output.jobs is defined
+          - '"IMSPLEX={{DFS_IMSPlex}}" in hws_job_output.jobs[0].ddnames[0].content | join'

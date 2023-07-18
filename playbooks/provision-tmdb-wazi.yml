@@ -1,0 +1,76 @@
+---
+#
+# Copyright 2023 IBM Inc. All Rights Reserved
+# SPDX-License-Identifier: Apache-2.0
+#
+- name: IMS TMDB Provisioning
+  hosts: all
+  gather_facts: false
+  # * Include different variable files depending on environment/inventory used
+  vars_files:
+    - vars_wazi/ims-dbdc.yml
+  environment: '{{ system_environment }}'
+
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+    - operator_sdk.util
+
+  tasks:
+    
+    # check if licence has been accepted and fail if not.
+    - name: check for license agreement and fail if not accepted
+      ansible.builtin.fail:
+        msg: Product license was not accepted
+      when: k8s_managed and not accept
+
+    - include_role:
+        name: set_up_run_environment
+
+    # This block is for handling 'Create' event
+    - block:  
+        - name: Provisioning starting.... this is a new instance
+          include_role:
+            name: update_instance_status
+          vars:
+            status_key: 'run_result'
+            status_val: 'Provisioning in progress...'
+            instance_kind: TMDB
+          when: tmdb_cr_instance.resources[0].status.run_result is not defined
+
+        - name: Validate user inputs
+          include_role: 
+            name: check_inputs
+          vars:
+            fail_task: true
+      when: k8s_managed
+    - block:
+      - name: Check if IMS already up
+        include_role: 
+          name: check_duplicate_ims
+
+      - name: Check if IMSPlex already up
+        include_role: 
+          name: check_duplicate_imsplex
+
+      - name: Check if ports are available
+        include_role:
+          name: check_port
+        vars:
+          in_reconcile_mode: '{{reconcile_run}}'
+
+      - include_role:
+          name: provision_ims
+
+      - include_role:
+          name: monitor_ims
+
+      always:
+        - name: Delete the temporary provision files directory
+          file:
+            path: "{{ tmdb_tmp_dir.path }}"
+            state: absent
+      vars:
+        uss_file_path: '{{ tmdb_tmp_dir.path }}'
+  handlers:
+    - include: handlers/handlers.yml
