@@ -1,0 +1,41 @@
+---
+#
+# Copyright 2023 IBM Inc. All Rights Reserved
+# SPDX-License-Identifier: Apache-2.0
+#
+# Check if IMS already up
+- name: Check for duplicate IMS
+  collections:
+      - ibm.ibm_zos_core
+      - ibm.ibm_zos_ims
+      
+  block:
+    - name: Check if IMS {{ DFS_IMS_SSID }} already Up
+      zos_operator:
+        cmd: 'd a,{{ DFS_IMS_SSID }}CTL'
+      register: ctl_output
+
+    # IMS already up, instance not in 'failedDup', and a reconcile comes in, do nothing, maintain 'Success' status
+    - block:
+        - name: IMS {{ DFS_IMS_SSID }} already up
+          debug: ''
+        - meta: end_host
+      when: 
+        - reconcile_run
+        - ctl_output.content is defined and "NOT FOUND" not in ctl_output.content | join
+        - tmdb_cr_instance.resources[0].status.run_result is defined and tmdb_cr_instance.resources[0].status.run_result != 'failedDup'
+
+    # IMS already up and a new/recon 'Create' comes in, fail it with 'failedDup' status
+    - block:
+        - name: Update CR instance run status
+          include_role:
+            name: update_instance_status
+          vars:
+            status_key: 'run_result'
+            status_val: 'failedDup'
+            instance_kind: TMDB
+        - fail:
+            msg: Duplidate IMS {{ DFS_IMS_SSID }}
+      when: 
+        # - not reconcile_run
+        - ctl_output.content is defined and "NOT FOUND" not in ctl_output.content | join 

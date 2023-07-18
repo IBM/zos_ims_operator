@@ -1,0 +1,10 @@
+---
+#
+# Copyright 2023 IBM Inc. All Rights Reserved
+# SPDX-License-Identifier: Apache-2.0
+#
+# Default vars for ims dataset services
+work_dataset: ""
+sysdef_datasets: ""
+runtime_datasets: ""
+system_datasets: ""
