@@ -26,6 +26,9 @@ The **IBM IMS Operator collection** contains the following capabilities:
 
 This Ansible collection must be used with **z/OS Cloud Broker V2.2 or newer.** For all system requirements, see the [documentation](https://www.ibm.com/docs/SSV97FN_latest/zstack/system-requirements.html).
 
+**Customization Guide**
+=========
+Please refer to the [Customization Guide](Customization.md) for more information on implementation details and how to customize this collection for your own environment.
 
 **Copyright**
 =========
