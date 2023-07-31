@@ -1,8 +1,7 @@
 ---
-#
-# Copyright 2023 IBM Inc. All Rights Reserved
-# SPDX-License-Identifier: Apache-2.0
-#
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
 - name: IMS TMDB Provisioning
   hosts: all
   gather_facts: false
@@ -22,13 +21,18 @@
     - name: check for license agreement and fail if not accepted
       ansible.builtin.fail:
         msg: Product license was not accepted
-      when: k8s_managed and not accept
+      when: not accept
+      # when: k8s_managed and not accept
 
     - include_role:
         name: set_up_run_environment
 
     # This block is for handling 'Create' event
     - block:  
+        - name: send all templates to host
+          include_role:
+            name: send_all_templates
+
         - name: Provisioning starting.... this is a new instance
           include_role:
             name: update_instance_status
@@ -38,12 +42,23 @@
             instance_kind: TMDB
           when: tmdb_cr_instance.resources[0].status.run_result is not defined
 
-        - name: Validate user inputs
-          include_role: 
-            name: check_inputs
+        - name: Saving templates location.... this is a new instance
+          include_role:
+            name: update_instance_status
           vars:
-            fail_task: true
-      when: k8s_managed
+            status_key: 'templates_path'
+            status_val: '{{tmdb_tmp_dir}}'
+            instance_kind: TMDB
+
+      when: not reconcile_run
+
+    - name: Validate user inputs
+      include_role: 
+        name: check_inputs
+      vars:
+        fail_task: true
+      # when: k8s_managed
+
     - block:
       - name: Check if IMS already up
         include_role: 
@@ -66,10 +81,21 @@
           name: monitor_ims
 
       always:
-        - name: Delete the temporary provision files directory
-          file:
-            path: "{{ tmdb_tmp_dir.path }}"
-            state: absent
+        - block:
+          - debug:
+              var: ansible_failed_task
+          when: ansible_failed_task is defined
+        - block:
+          - debug:
+              var: ansible_failed_result
+          when: ansible_failed_result is defined
+        - block:
+          - debug:  
+              msg: 'temp dir to delete: {{tmdb_tmp_dir.path}}'
+        # - name: Delete the temporary provision files directory
+        #   file:
+        #     path: "{{ tmdb_tmp_dir.path }}"
+        #     state: absent
       vars:
         uss_file_path: '{{ tmdb_tmp_dir.path }}'
   handlers:

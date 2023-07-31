@@ -1,8 +1,7 @@
 ---
-#
-# Copyright 2023 IBM Inc. All Rights Reserved
-# SPDX-License-Identifier: Apache-2.0
-#
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
 # DBRC Services
 - name: DBRC Services
   collections:
@@ -11,38 +10,40 @@
 
   block:
 
-    - block:
-      - set_fact:
-          eager_role_path: '{{role_path}}'
+    # - block:
+      # - set_fact:
+      #     eager_role_path: '{{role_path}}'
 
-      # Send the template over
-      - include_role:
-          name: send-template
-        vars:
-          path: '{{ eager_role_path }}/templates/DFSDFDRC.j2'
+      # # Send the template over
+      # - include_role:
+      #     name: send-template
+      #   vars:
+      #     path: '{{ eager_role_path }}/templates/DFSDFDRC.j2'
 
-      when: dbrc_defaults and not provision
+      # when: dbrc_defaults and not reconcile_run
 
 
     - name: Specify DBRC defaults
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFSDFDRC.j2'
-        location: USS
-        wait: "{{ zos_job_submit_wait }}"
-        wait_time_s: "{{ zos_job_submit_wait_s }}"
-        return_output: "{{ zos_job_submit_return_output }}"
+      command: 'jsub -f {{ uss_file_path }}/DFSDFDRC.j2'
+      # zos_job_submit: 
+      #   max_rc: 16
+      #   src: '{{ uss_file_path }}/DFSDFDRC.j2'
+      #   location: USS
+      #   wait: "{{ zos_job_submit_wait }}"
+      #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+      #   return_output: "{{ zos_job_submit_return_output }}"
       when: dbrc_defaults
 
-    - block:
-      - set_fact:
-          eager_role_path: '{{role_path}}'
+    # - block:
+      # - set_fact:
+      #     eager_role_path: '{{role_path}}'
 
-      - include_role:
-          name: send-template
-        vars:
-          path: '{{ eager_role_path }}/templates/DFSE314J.j2'
+      # - include_role:
+      #     name: send-template
+      #   vars:
+      #     path: '{{ eager_role_path }}/templates/DFSE314J.j2'
 
-      when: prep_dbrc and not provision
+      # when: prep_dbrc and not reconcile_run
 
       # - name: Initialize RECON data sets
       #   ims_dbrc:
@@ -54,10 +55,12 @@
       #     genjcl_input_dataset: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB"
 
     - name: Prep IMS DBRC
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFSE314J.j2'
-        location: USS
-        wait: "{{ zos_job_submit_wait }}"
-        wait_time_s: "{{ zos_job_submit_wait_s }}"
-        return_output: "{{ zos_job_submit_return_output }}"
+      command: 'jsub -f {{ uss_file_path }}/DFSE314J.j2'
+      # zos_job_submit: 
+      #   max_rc: 16
+      #   src: '{{ uss_file_path }}/DFSE314J.j2'
+      #   location: USS
+      #   wait: "{{ zos_job_submit_wait }}"
+      #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+      #   return_output: "{{ zos_job_submit_return_output }}"
       when: prep_dbrc

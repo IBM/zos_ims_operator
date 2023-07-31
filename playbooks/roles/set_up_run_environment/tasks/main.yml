@@ -1,10 +1,9 @@
 ---
-#
-# Copyright 2023 IBM Inc. All Rights Reserved
-# SPDX-License-Identifier: Apache-2.0
-#
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
 - name: Retrieve k8s context
-  when: k8s_managed
+  # when: k8s_managed
   block:
   - debug:
       msg:
@@ -39,6 +38,7 @@
       instance_creationTime: "{{ tmdb_cr_instance.resources[0].metadata.creationTimestamp[0:15]}}"
       instance_lastTransitionTime: "{{ tmdb_cr_instance.resources[0].status.conditions[0].lastTransitionTime[0:15]}}"
       reconcile_run: false
+      ims_is_up: false
       active_hws_jobid: ""
   
   - debug:
@@ -64,6 +64,7 @@
         - '{{IMS_CONNECT_PORT}}'
         - '{{IMS_CONNECT_SSLPORT}}'
         - '{{reconcile_run}}'
+        - '{{ims_is_up}}'
 
   - name: This run is due to reconcile
     set_fact:
@@ -84,6 +85,13 @@
       //  MSGCLASS={{ MSG_CLASS }},
       //  MSGLEVEL=(1,1),
       //  CLASS={{ JOB_CLASS }}
+    ODBM_JOB_CARD: |-
+          //{{ DFS_IMS_SSID }}ODBM JOB 'testing',
+          //*  NOTIFY={{ TARGET_USERNAME | upper }},
+          //  USER={{ TARGET_USERNAME | upper }},
+          //  MSGCLASS={{ MSG_CLASS }},
+          //  MSGLEVEL=(1,1),
+          //  CLASS={{ JOB_CLASS }}
     IST_VTAM_IMSAPPLID: '{{ DFS_IMS_SSID }}'
     ADDTL_SAMP_PROC_LIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB'
     TCPIP_PROFILE_TMP: '{{ DFS_AUTH_LIB_HLQ1 }}.TEMP'
@@ -108,6 +116,11 @@
   - tempfile:
       state: directory
     register: tmdb_tmp_dir
+    when: tmdb_cr_instance.resources[0].status.templates_path is not defined
+
+  - set_fact:
+      tmdb_tmp_dir: '{{tmdb_cr_instance.resources[0].status.templates_path}}'
+    when: tmdb_cr_instance.resources[0].status.templates_path is defined
 
   - set_fact:
       DFS_AUTH_LIB_SYSHLQ: "{% if DFS_AUTH_LIB_SYSHLQ2 %}{{DFS_AUTH_LIB_SYSHLQ1}}.{{DFS_AUTH_LIB_SYSHLQ2}}{% else %}{{DFS_AUTH_LIB_SYSHLQ1}}{% endif %}"

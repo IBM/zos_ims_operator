@@ -1,8 +1,7 @@
 ---
-#
-# Copyright 2023 IBM Inc. All Rights Reserved
-# SPDX-License-Identifier: Apache-2.0
-#
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
 # IEF Services
 - name: IEF Services
   collections:
@@ -12,13 +11,13 @@
   block:
 
     - block:
-      - set_fact:
-          eager_role_path: '{{role_path}}'
+      # - set_fact:
+      #     eager_role_path: '{{role_path}}'
 
-      - include_role:
-          name: send-templates
-        vars:
-          template_path: '{{ eager_role_path }}/templates/IEFJOBSX.j2'
+      # - include_role:
+      #     name: send-templates
+      #   vars:
+      #     template_path: '{{ eager_role_path }}/templates/IEFJOBSX.j2'
 
       - include_role:
           name: submit-rexx
@@ -29,17 +28,17 @@
 
       when: iefjobs == "delete"
 
-    - block:
-      - set_fact:
-          eager_role_path: '{{role_path}}'
+    # - block:
+      # - set_fact:
+      #     eager_role_path: '{{role_path}}'
 
 
-      - include_role:
-          name: send-templates
-        vars:
-          template_path: '{{ eager_role_path }}/templates/IEFJOBS.j2'
+      # - include_role:
+      #     name: send-templates
+      #   vars:
+      #     template_path: '{{ eager_role_path }}/templates/IEFJOBS.j2'
 
-      when: iefjobs == "create" and not provision
+      # when: iefjobs == "create" and not reconcile_run
 
     - include_role:
         name: submit-rexx
@@ -48,4 +47,4 @@
         rexx_name: 'IEFJOBS.j2'
         max_rc: 0
 
-      when: iefjobs == "create"
+      when: iefjobs == "create" and not reconcile_run

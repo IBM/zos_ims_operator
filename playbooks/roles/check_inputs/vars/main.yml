@@ -1,6 +1,5 @@
-#
-# Copyright 2023 IBM Inc. All Rights Reserved
-# SPDX-License-Identifier: Apache-2.0
-#
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
 # vars file for check_inputs
-fail_task: true
+fail_task:

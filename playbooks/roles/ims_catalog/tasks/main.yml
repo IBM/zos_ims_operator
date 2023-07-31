@@ -1,8 +1,7 @@
 ---
-#
-# Copyright 2023 IBM Inc. All Rights Reserved
-# SPDX-License-Identifier: Apache-2.0
-#
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
 # Catalog Services
 - name: Catalog Services
   collections:
@@ -11,26 +10,34 @@
 
   block:
 
-    - block:
+    # - block:
 
-      - set_fact:
-          eager_role_path: '{{role_path}}'
+      # - set_fact:
+      #     eager_role_path: '{{role_path}}'
 
-      - include_role:
-          name: send-template
-        vars:
-          path: '{{ eager_role_path }}/templates/DFSALCAT.j2'
+      # - include_role:
+      #     name: send-template
+      #   vars:
+      #     path: '{{ eager_role_path }}/templates/DFSALCAT.j2'
 
-      when: catalog == "allocate" and not provision
+      # when: catalog == "allocate" and not reconcile_run
 
+    - name: 'Catalog already exists?'
+      zos_find:
+          patterns: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.*'
+          resource_type: cluster
+      register: catalog_find_output
+   
     - name: Allocate IMS catalog DB
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFSALCAT.j2'
-        location: USS
-        wait: "{{ zos_job_submit_wait }}"
-        wait_time_s: "{{ zos_job_submit_wait_s }}"
-        return_output: "{{ zos_job_submit_return_output }}"
-      when: catalog == "allocate"
+      command: 'jsub -f {{ uss_file_path }}/DFSALCAT.j2'
+      # zos_job_submit: 
+      #   max_rc: 16
+      #   src: '{{ uss_file_path }}/DFSALCAT.j2'
+      #   location: USS
+      #   wait: "{{ zos_job_submit_wait }}"
+      #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+      #   return_output: "{{ zos_job_submit_return_output }}"
+      when: catalog == "allocate" and (catalog_find_output.matched | int) == 0
 
     - name: Load Catalog
       ims_catalog_populate:
@@ -83,7 +90,15 @@
         control_statements:
           managed_acbs:
             setup: true
-      when: catalog == "load"
+      register: response
+      ignore_errors: true
+      when: catalog == "load" and not reconcile_run
+
+    - fail: 
+        msg: '{{response.stderr}}'
+      when: 
+        - response.rc is defined
+        - (response.rc | int) > 8
 
     - name: Update Catalog
       ims_catalog_populate:
@@ -121,7 +136,15 @@
           secondary: 75
           secondary_unit: CYL
           type: SEQ
-      when: catalog == "update"
+      register: response
+      ignore_errors: true
+      when: catalog == "update" and not reconcile_run
+
+    - fail: 
+        msg: '{{response.stderr}}'
+      when: 
+        - response.rc is defined
+        - (response.rc | int) > 8
 
     - name: Create ACBs for catalog setup
       ibm.ibm_zos_ims.ims_acb_gen:
@@ -140,9 +163,15 @@
           - '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL'
         steplib:
           - '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL'
-      when: catalog == "setup"
       register: response
-      failed_when: (response.rc | int) > 8
+      ignore_errors: true
+      when: catalog == "setup" and not reconcile_run
+
+    - fail: 
+        msg: '{{response}}'
+      when: 
+        - response.rc is defined
+        - (response.rc | int) > 8
 
     - name: Query Catalog Service
       ims_command:
@@ -198,5 +227,5 @@
           - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.HWSRCDR'
             state: absent
             volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
-      when: catalog == "delete"
+      when: catalog == "delete" and (catalog_find_output.matched | int) > 0
 

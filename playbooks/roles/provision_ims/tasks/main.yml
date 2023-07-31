@@ -1,8 +1,7 @@
 ---
-#
-# Copyright 2023 IBM Inc. All Rights Reserved
-# SPDX-License-Identifier: Apache-2.0
-#
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
 # tasks file for provision_ims
 - name: Provision IMS
   collections:
@@ -12,13 +11,13 @@
   block:
 
     - set_fact:
-        ODBM_JOB_CARD: |-
-          //{{ DFS_IMS_SSID }}ODBM JOB 'testing',
-          //*  NOTIFY={{ TARGET_USERNAME | upper }},
-          //  USER={{ TARGET_USERNAME | upper }},
-          //  MSGCLASS={{ MSG_CLASS }},
-          //  MSGLEVEL=(1,1),
-          //  CLASS={{ JOB_CLASS }}
+        # ODBM_JOB_CARD: |-
+        #   //{{ DFS_IMS_SSID }}ODBM JOB 'testing',
+        #   //*  NOTIFY={{ TARGET_USERNAME | upper }},
+        #   //  USER={{ TARGET_USERNAME | upper }},
+        #   //  MSGCLASS={{ MSG_CLASS }},
+        #   //  MSGLEVEL=(1,1),
+        #   //  CLASS={{ JOB_CLASS }}
 
     # - include_role:
     #     name: install-bzip2
@@ -30,17 +29,20 @@
         sysdef_datasets: allocate
         runtime_datasets: allocate
         java_dataset: ""
+      when: not ims_is_up
 
     - include_role:
         name: ims_initialize
       vars:
         send_procs: true
         DFS_INIT_JAVA_CONF: false
+      when: not ims_is_up
 
     - include_role:
         name: ims_proclib
       vars:
         create_sample: true
+      when: not ims_is_up
 
     - include_role:
         name: ims_sysdef
@@ -48,38 +50,45 @@
         preprocess: true
         stage1: true
         stage2: true
+      when: not ims_is_up
 
     - include_role:
         name: ims_racf
       vars:
         prep_racf: true
+      when: not ims_is_up
 
     - include_role:
         name: ims_apf
       vars:
         auth_datasets: true
+      when: not ims_is_up
 
     - include_role:
         name: ims_dataset
       vars:
         system_datasets: allocate
         java_dataset: ""
+      when: not ims_is_up
 
     - include_role:
         name: ims_catalog
       vars:
         catalog: allocate
+      when: not ims_is_up
 
     - include_role:
         name: ims_dbrc
       vars:
         prep_dbrc: true
+      when: not ims_is_up
 
     - include_role:
         name: ims_proclib
       vars:
         add: true
         bpeconfg: true
+      when: not ims_is_up
 
     # Call SCI config to copy & config SCI
     - include_role:

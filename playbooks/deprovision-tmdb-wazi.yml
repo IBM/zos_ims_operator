@@ -1,8 +1,7 @@
 ---
-#
-# Copyright 2023 IBM Inc. All Rights Reserved
-# SPDX-License-Identifier: Apache-2.0
-#
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
 - name: IMS TMDB De-provisioning
   hosts: all
   gather_facts: false
@@ -30,16 +29,26 @@
           when: 
             - tmdb_cr_instance.resources[0].status.run_result is defined 
             - tmdb_cr_instance.resources[0].status.run_result == 'failedDup'
-            - k8s_managed
+            # - k8s_managed
 
         - include_role:
             name: deprovision_ims
 
       always:
-        - name: Delete the temporary provision files directory
+        - block:
+          - debug:
+              var: ansible_failed_task
+          when: ansible_failed_task is defined
+        - block:
+          - debug:
+              var: ansible_failed_result
+          when: ansible_failed_result is defined
+        - name: Delete the temporary provision files directory {{ tmdb_tmp_dir.path }}
           file:
             path: "{{ tmdb_tmp_dir.path }}"
             state: absent
+          when: tmdb_cr_instance.resources[0].status.run_result is defined and tmdb_cr_instance.resources[0].status.run_result == 'Deprovision completed'
+
       vars:
         uss_file_path: '{{ tmdb_tmp_dir.path }}'
 

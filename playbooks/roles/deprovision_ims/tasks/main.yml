@@ -1,8 +1,7 @@
 ---
-#
-# Copyright 2023 IBM Inc. All Rights Reserved
-# SPDX-License-Identifier: Apache-2.0
-#
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
 # tasks file for deprovision_ims
 - name: Deprovision IMS
   collections:
@@ -119,3 +118,11 @@
           zos_level: '{{ZOS_RELEASE}}'
           function: 'remove'
         when: ODBM_SSLPORTID
+    
+    - name: Update CR instance run status
+      include_role:
+        name: update_instance_status
+      vars:
+        status_key: 'run_result'
+        status_val: 'Deprovision completed'
+        instance_kind: TMDB

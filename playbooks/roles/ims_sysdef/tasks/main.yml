@@ -1,8 +1,7 @@
 ---
-#
-# Copyright 2023 IBM Inc. All Rights Reserved
-# SPDX-License-Identifier: Apache-2.0
-#
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
   # sysdef services
   - name: System Definition Services
     collections:
@@ -21,16 +20,19 @@
           vars:
             path: '{{ eager_role_path }}/templates/DFSGNPRE.j2'
 
-        when: preprocess and not provision
+          when: preprocess
+          # when: preprocess and not reconcile_run
 
-      - name: IMS system definition preprocessor utility
-        zos_job_submit:
-          src: '{{ uss_file_path }}/DFSGNPRE.j2'
-          location: USS
-          wait: "{{ zos_job_submit_wait }}"
-          wait_time_s: "{{ zos_job_submit_wait_s }}"
-          return_output: "{{ zos_job_submit_return_output }}"
-        when: preprocess
+        - name: IMS system definition preprocessor utility
+          command: 'jsub -f {{ uss_file_path }}/DFSGNPRE.j2'
+          # zos_job_submit: 
+          #   max_rc: 16
+          #   src: '{{ uss_file_path }}/DFSGNPRE.j2'
+          #   location: USS
+          #   wait: "{{ zos_job_submit_wait }}"
+          #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+          #   return_output: "{{ zos_job_submit_return_output }}"
+          when: preprocess
 
       - block:
 
@@ -42,17 +44,19 @@
           vars:
             path: '{{ eager_role_path }}/templates/DFS4STG1.j2'
 
-        when: stage1 and not provision
+          when: stage1
+          # when: stage1 and not reconcile_run
 
-      - name: Sysdef stage 1
-        zos_job_submit:
-          src: '{{ uss_file_path }}/DFS4STG1.j2'
-          location: USS
-          wait: "{{ zos_job_submit_wait }}"
-          wait_time_s: "{{ zos_job_submit_wait_s }}"
-          max_rc: 2
-          return_output: "{{ zos_job_submit_return_output }}"
-        when: stage1
+        - name: Sysdef stage 1
+          command: 'jsub -f {{ uss_file_path }}/DFS4STG1.j2'
+          # zos_job_submit: 
+          #   max_rc: 16
+          #   src: '{{ uss_file_path }}/DFS4STG1.j2'
+          #   location: USS
+          #   wait: "{{ zos_job_submit_wait }}"
+          #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+          #   return_output: "{{ zos_job_submit_return_output }}"
+          when: stage1
 
 
       - block:
@@ -65,15 +69,17 @@
           vars:
             path: '{{ eager_role_path }}/templates/DFS4STG2.j2'
 
-        when: stage2 and not provision
+          when: stage2
+          # when: stage2 and not reconcile_run
 
 
-      - name: Sysdef stage 2
-        zos_job_submit:
-          src: '{{ uss_file_path }}/DFS4STG2.j2'
-          location: USS
-          wait: "{{ zos_job_submit_wait }}"
-          wait_time_s: "{{ zos_job_submit_wait_s }}"
-          max_rc: 2
-          return_output: "{{ zos_job_submit_return_output }}"
-        when: stage2
+        - name: Sysdef stage 2
+          command: 'jsub -f {{ uss_file_path }}/DFS4STG2.j2'
+          # zos_job_submit: 
+          #   max_rc: 16
+          #   src: '{{ uss_file_path }}/DFS4STG2.j2'
+          #   location: USS
+          #   wait: "{{ zos_job_submit_wait }}"
+          #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+          #   return_output: "{{ zos_job_submit_return_output }}"
+          when: stage2

@@ -1,8 +1,7 @@
 ---
-#
-# Copyright 2023 IBM Inc. All Rights Reserved
-# SPDX-License-Identifier: Apache-2.0
-#
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
 # tasks file for monitor_ims
 - name: Monitor IMS
   collections:
@@ -103,12 +102,14 @@
     - block:
 
       - name: ICON start
-        zos_job_submit:
-          src: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.JOBS({{ DFS_IMS_SSID }}HWS1)"
-          location: DATA_SET
-          wait: "{{ zos_job_submit_wait }}"
-          wait_time_s: "{{ zos_job_submit_wait_s }}"
-          return_output: "{{ zos_job_submit_return_output }}"
+        command: 'jsub {{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.JOBS({{ DFS_IMS_SSID }}HWS1)'
+        # zos_job_submit: 
+        #   max_rc: 16
+        #   src: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.JOBS({{ DFS_IMS_SSID }}HWS1)"
+        #   location: DATA_SET
+        #   wait: "{{ zos_job_submit_wait }}"
+        #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+        #   return_output: "{{ zos_job_submit_return_output }}"
 
       when: imscon_status.failed
 

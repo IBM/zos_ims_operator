@@ -1,8 +1,7 @@
 ---
-#
-# Copyright 2023 IBM Inc. All Rights Reserved
-# SPDX-License-Identifier: Apache-2.0
-#
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
 # tasks file for initialize
 - name: Initialize provisioning
   collections:
@@ -83,17 +82,18 @@
 
     # * Need this because Ansible lazily interprets role_path
     # * Results in wrong paths being sent when passing vars that use role_path var
-    - block:
+    # - block:
 
-      - set_fact:
-          eager_role_path: '{{role_path}}'
+    #   - set_fact:
+    #       eager_role_path: '{{role_path}}'
 
-      - include_role:
-          name: send-templates
-        vars:
-          template_path: '{{ eager_role_path }}/templates/provision/*'
+    #   - include_role:
+    #       name: send-templates
+    #     vars:
+    #       template_path: '{{ eager_role_path }}/templates/provision/*'
+    #       uss_file_path: '{{ tmdb_tmp_dir.path }}'
 
-      when: provision
+    #   when: not reconcile_run
 
     - block:
         - name: Copy imsjava to target
@@ -113,18 +113,21 @@
 
     - name: Send PROCLIB members
       block:
-        - set_fact:
-            eager_role_path: '{{role_path}}'
         - name: Create temporary directory to store PROCLIB members
           tempfile:
             state: directory
           register: proclib_tmp_dir
+
+        - set_fact:
+            eager_role_path: '{{role_path}}'
+
         - name: Send PROCLIB member templates to USS directory
           include_role:
             name: send-templates
           vars:
             template_path: '{{eager_role_path}}/templates/procs/*'
             uss_file_path: '{{ proclib_tmp_dir.path }}'
+
         - name: Remove extensions from filenames
           shell: >
             for procname in $(ls *.j2); do
@@ -133,6 +136,7 @@
             done
           args:
             chdir: '{{ proclib_tmp_dir.path }}'
+          when: not reconcile_run
       always:
         - name: Delete the temporary PROCLIB files directory
           file:

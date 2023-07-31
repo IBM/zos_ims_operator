@@ -5,7 +5,7 @@
 name: zos-ims-operator
 displayName: IBM Z and Cloud Modernization Stack - IMS Operator
 domain: ibm
-version: 1.1.0
+version: 1.2.0
 inventoryName: zosendpoint
 description: >- # TODO Can also be a path to a markdown file?
   # IBM Z and Cloud Modernization Stack - IMS Operator 

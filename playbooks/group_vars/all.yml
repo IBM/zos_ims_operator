@@ -1,9 +1,5 @@
-#
-# Copyright 2023 IBM Inc. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
-ansible_python_interpreter:  /usr/lpp/IBM/cyp/v3r9/pyz/bin/python3
-PYZ: /usr/lpp/IBM/cyp/v3r9/pyz
+ansible_python_interpreter:  /usr/lpp/IBM/cyp/v3r10/pyz/bin/python3
+PYZ: /usr/lpp/IBM/cyp/v3r10/pyz
 ZOAU: /usr/lpp/IBM/zoautil
 JAVA: /usr/lpp/java/java180/J8.0_64/bin
 COBOL: /usr/lpp/cobol/cob630/igyv6r3/bin

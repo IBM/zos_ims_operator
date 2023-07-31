@@ -1,8 +1,7 @@
 ---
-#
-# Copyright 2023 IBM Inc. All Rights Reserved
-# SPDX-License-Identifier: Apache-2.0
-#
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
 # tasks file for proclib
 - name: Proclib operations
   collections:
@@ -10,137 +9,149 @@
 
   block:
 
-    - block:
+    # - block:
 
-      - set_fact:
-          eager_role_path: '{{role_path}}'
+      # - set_fact:
+      #     eager_role_path: '{{role_path}}'
 
-      - include_role:
-          name: send-template
-        vars:
-          path: '{{ eager_role_path }}/templates/DFSE302J.j2'
+      # - include_role:
+      #     name: send-template
+      #   vars:
+      #     path: '{{ eager_role_path }}/templates/DFSE302J.j2'
 
-      when: add and not provision
+      # when: add and not reconcile_run
 
     - name: Add IMS procs
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFSE302J.j2'
-        location: USS
-        wait: "{{ zos_job_submit_wait }}"
-        wait_time_s: "{{ zos_job_submit_wait_s }}"
-        return_output: "{{ zos_job_submit_return_output }}"
-      when: add
+      command: 'jsub -f {{ uss_file_path }}/DFSE302J.j2'
+      # zos_job_submit: 
+      #   max_rc: 16
+      #   src: '{{ uss_file_path }}/DFSE302J.j2'
+      #   location: USS
+      #   wait: "{{ zos_job_submit_wait }}"
+      #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+      #   return_output: "{{ zos_job_submit_return_output }}"
+      when: add and not reconcile_run
 
     # Add ADDS THE BPECONFG MEMBER TO IMS PROCLIB.
     # THIS MEMBER DEFINES THE CONFIGURATION FILE FOR BPE WITH
     # CQS, OM, RM, SCI.
-    - block:
+    # - block:
 
-      - set_fact:
-          eager_role_path: '{{role_path}}'
+      # - set_fact:
+      #     eager_role_path: '{{role_path}}'
 
-      - include_role:
-          name: send-template
-        vars:
-          path: '{{ eager_role_path }}/templates/DFSE303J.j2'
+      # - include_role:
+      #     name: send-template
+      #   vars:
+      #     path: '{{ eager_role_path }}/templates/DFSE303J.j2'
 
-      when: bpeconfg and not provision
+      # when: bpeconfg and not reconcile_run
 
     - name: Define IMS subcomponents
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFSE303J.j2'
-        location: USS
-        wait: "{{ zos_job_submit_wait }}"
-        wait_time_s: "{{ zos_job_submit_wait_s }}"
-        return_output: "{{ zos_job_submit_return_output }}"
+      command: 'jsub -f {{ uss_file_path }}/DFSE303J.j2'
+      # zos_job_submit: 
+      #   max_rc: 16
+      #   src: '{{ uss_file_path }}/DFSE303J.j2'
+      #   location: USS
+      #   wait: "{{ zos_job_submit_wait }}"
+      #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+      #   return_output: "{{ zos_job_submit_return_output }}"
       when: bpeconfg
 
 
-    - block:
+    # - block:
 
-      - set_fact:
-          eager_role_path: '{{role_path}}'
+      # - set_fact:
+      #     eager_role_path: '{{role_path}}'
 
-      - include_role:
-          name: send-template
-        vars:
-          path: '{{ eager_role_path }}/templates/DFS4CPYP.j2'
+      # - include_role:
+      #     name: send-template
+      #   vars:
+      #     path: '{{ eager_role_path }}/templates/DFS4CPYP.j2'
 
-      when: copy and not provision
+      # when: copy and not reconcile_run
 
     - name: Copy procs in IMS PROCLIB
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFS4CPYP.j2'
-        location: USS
-        wait: "{{ zos_job_submit_wait }}"
-        wait_time_s: "{{ zos_job_submit_wait_s }}"
-        return_output: "{{ zos_job_submit_return_output }}"
-      when: copy
+      command: 'jsub -f {{ uss_file_path }}/DFS4CPYP.j2'
+      # zos_job_submit: 
+      #   max_rc: 16
+      #   src: '{{ uss_file_path }}/DFS4CPYP.j2'
+      #   location: USS
+      #   wait: "{{ zos_job_submit_wait }}"
+      #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+      #   return_output: "{{ zos_job_submit_return_output }}"
+      when: copy and not reconcile_run
 
 
-    - block:
+    # - block:
 
-      - set_fact:
-          eager_role_path: '{{role_path}}'
+      # - set_fact:
+      #     eager_role_path: '{{role_path}}'
 
-      - include_role:
-          name: send-template
-        vars:
-          path: '{{ eager_role_path }}/templates/DFSE313J.j2'
+      # - include_role:
+      #     name: send-template
+      #   vars:
+      #     path: '{{ eager_role_path }}/templates/DFSE313J.j2'
 
-      when: copy_to_jobs and not provision
+      # when: copy_to_jobs and not reconcile_run
 
     - name: Copy procs to jobs dataset
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFSE313J.j2'
-        location: USS
-        wait: "{{ zos_job_submit_wait }}"
-        wait_time_s: "{{ zos_job_submit_wait_s }}"
-        return_output: "{{ zos_job_submit_return_output }}"
-      when: copy_to_jobs
+      command: 'jsub -f {{ uss_file_path }}/DFSE313J.j2'
+      # zos_job_submit: 
+      #   max_rc: 16
+      #   src: '{{ uss_file_path }}/DFSE313J.j2'
+      #   location: USS
+      #   wait: "{{ zos_job_submit_wait }}"
+      #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+      #   return_output: "{{ zos_job_submit_return_output }}"
+      when: copy_to_jobs and not reconcile_run
 
 
-    - block:
+    # - block:
 
-      - set_fact:
-          eager_role_path: '{{role_path}}'
+      # - set_fact:
+      #     eager_role_path: '{{role_path}}'
 
-      - include_role:
-          name: send-template
-        vars:
-          path: '{{ eager_role_path }}/templates/DFSCPYST.j2'
+      # - include_role:
+      #     name: send-template
+      #   vars:
+      #     path: '{{ eager_role_path }}/templates/DFSCPYST.j2'
 
-      when: copy_stage_libs and not provision
+      # when: copy_stage_libs and not reconcile_run
 
     - name: Copy staging libs
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFSCPYST.j2'
-        location: USS
-        wait: "{{ zos_job_submit_wait }}"
-        wait_time_s: "{{ zos_job_submit_wait_s }}"
-        return_output: "{{ zos_job_submit_return_output }}"
-      when: copy_stage_libs
+      command: 'jsub -f {{ uss_file_path }}/DFSCPYST.j2'
+      # zos_job_submit: 
+      #   max_rc: 16
+      #   src: '{{ uss_file_path }}/DFSCPYST.j2'
+      #   location: USS
+      #   wait: "{{ zos_job_submit_wait }}"
+      #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+      #   return_output: "{{ zos_job_submit_return_output }}"
+      when: copy_stage_libs and not reconcile_run
 
 
-    - block:
+    # - block:
 
-      - set_fact:
-          eager_role_path: '{{role_path}}'
+      # - set_fact:
+      #     eager_role_path: '{{role_path}}'
 
-      - include_role:
-          name: send-template
-        vars:
-          path: '{{ eager_role_path }}/templates/DFSPROCB.j2'
+      # - include_role:
+      #     name: send-template
+      #   vars:
+      #     path: '{{ eager_role_path }}/templates/DFSPROCB.j2'
 
-      when: create_sample and not provision
+      # when: create_sample and not reconcile_run
 
     - name: Create additional sample procedures
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFSPROCB.j2'
-        location: USS
-        wait: "{{ zos_job_submit_wait }}"
-        wait_time_s: "{{ zos_job_submit_wait_s }}"
-        return_output: "{{ zos_job_submit_return_output }}"
+      command: 'jsub -f {{ uss_file_path }}/DFSPROCB.j2'
+      # zos_job_submit: 
+      #   max_rc: 16
+      #   src: '{{ uss_file_path }}/DFSPROCB.j2'
+      #   location: USS
+      #   wait: "{{ zos_job_submit_wait }}"
+      #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+      #   return_output: "{{ zos_job_submit_return_output }}"
       when: create_sample
 
 

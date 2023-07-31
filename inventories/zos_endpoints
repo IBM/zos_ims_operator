@@ -1,0 +1,13 @@
+#
+# Copyright 2023 IBM Inc. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+all:
+  hosts:
+    wazi:
+      ansible_host: ansible-andy-zdt1.fyre.ibm.com
+      ansible_user: ibmuser
+      ansible_port: 2022
+      ansible_python_interpreter:  /usr/lpp/IBM/cyp/v3r9/pyz/bin/python3
+
+

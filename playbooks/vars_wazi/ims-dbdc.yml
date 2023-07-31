@@ -1,8 +1,7 @@
 ---
-#
-# Copyright 2023 IBM Inc. All Rights Reserved
-# SPDX-License-Identifier: Apache-2.0
-#
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
 # ---------------------------------------------------------------------------- #
 #                               TCPIP information                              #
 # ---------------------------------------------------------------------------- #
@@ -42,8 +41,8 @@ api_key: ''
 
 k8s_cr_event: create
 zos_job_submit_wait: false
-zos_job_submit_wait_s: 10
-zos_job_submit_return_output: False
+zos_job_submit_wait_s: 120
+zos_job_submit_return_output: false
 
 # The SSID for the IMS to be provisioned
 DFS_IMS_SSID: IMWZ
@@ -198,4 +197,4 @@ zCloud_IMS_SVC_Type4: '202'  #'249'
 
 
 # Optimizes runtime if user is provisioning IMS
-provision: true
+reconcile_run: false

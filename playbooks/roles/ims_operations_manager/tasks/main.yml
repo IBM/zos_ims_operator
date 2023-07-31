@@ -1,24 +1,29 @@
 ---
-#
-# Copyright 2023 IBM Inc. All Rights Reserved
-# SPDX-License-Identifier: Apache-2.0
-#
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
 # Tasks for Operations Manager (OM)
 - name: Operations Manager
   collections:
     - ibm.ibm_zos_core
     - ibm.ibm_zos_ims
-
+  vars:
+        om_not_up: false
+        
   block:
+
+    - name: Check if {{ DFS_IMS_SSID }}OM already Up
+      zos_operator:
+        cmd: 'd a,{{ DFS_IMS_SSID }}OM'
+      register: cmd_output
+    - set_fact:
+        om_not_up: true
+      when: cmd_output.content is defined and "NOT FOUND" in cmd_output.content | join
     - set_fact:
         bpe_config: '{{ role_path }}/templates/bpe_config.txt'
         oi_config: '{{ role_path }}/templates/oi_config.txt'
         om_config: '{{ role_path }}/templates/om_config.txt'
         rom_config: '{{ role_path }}/templates/rom_config.txt'
-
-    - name: check om value
-      debug:
-        var: om
 
     # AL: This code works, but OM doesn't start
     - name: Define BPECONFG
@@ -39,7 +44,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: om == "config"
+      when: om == "config" and not reconcile_run
 
     - name: Add CSLOI000 member
       zos_mvs_raw:
@@ -59,7 +64,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: om == "config"
+      when: om == "config" and not reconcile_run
 
     - name: Add OM member to PROCLIB
       zos_mvs_raw:
@@ -79,7 +84,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: om == "config"
+      when: om == "config" and not reconcile_run
 
     - name: Add CSLOIROM member
       zos_mvs_raw:
@@ -99,21 +104,23 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: om == "config"
+      when: om == "config" and not reconcile_run
 
     # Start OM
     - name: Start OM
       zos_operator:
         cmd: 's {{ DFS_IMS_SSID }}OM'
         verbose: true
-      when: om == "start"
+      when: 
+        - om == "start"
+        - om_not_up
 
     # Stop OM
     - name: Stop OM
       zos_operator:
         cmd: 'c {{ DFS_IMS_SSID }}OM'
         verbose: true
-      when: om == "stop"
+      when: om == "stop" and not om_not_up
 
     # Query OM status
     - name: Query OM status

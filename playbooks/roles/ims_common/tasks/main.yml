@@ -1,47 +1,73 @@
 ---
-#
-# Copyright 2023 IBM Inc. All Rights Reserved
-# SPDX-License-Identifier: Apache-2.0
-#
+###############################################################################
+# © Copyright IBM Corporation 2023
+###############################################################################
 # Common services for provision-ims-dbdc
 - name: Provision IMS
   collections:
     - ibm.ibm_zos_core
     - ibm.ibm_zos_ims
-
+  vars:
+      icon_not_up: false
+      ims_not_up: false
   block:
+    - name: Check if {{ DFS_IMS_SSID }}CTL already Up
+      zos_operator:
+        cmd: 'd a,{{ DFS_IMS_SSID }}CTL'
+      register: cmd_output
+
+    - set_fact:
+        ims_not_up: true
+      when: cmd_output.content is defined and "NOT FOUND" in cmd_output.content | join
 
     # Start IMS control region if start_ctl is true
     - name: Start IMS control region
       zos_operator:
         cmd: 's {{ DFS_IMS_SSID }}CTL'
         verbose: true
-      when: ctl == "start"
+      when: ctl == "start" and ims_not_up
 
     # Stop IMS control region
     - name: Stop IMS control region
       zos_operator:
         cmd: 'c {{ DFS_IMS_SSID }}CTL'
         verbose: true
-      when: ctl == "stop"
-      ignore_errors: yes
-
-    - name: Wait for IMS ready
-      include_role:
-        name: submit-rexx
-        public: yes
-      vars:
-        rexx_name: 'WaitJob.j2'
-        max_rc: 0
+      when: ctl == "stop" and not ims_not_up
       ignore_errors: true
-      when: wait_for_job
+
+    # - name: Wait for IMS ready
+    #   include_role:
+    #     name: submit-rexx
+    #     public: yes
+    #   vars:
+    #     rexx_name: 'WaitJob.j2'
+    #     max_rc: 0
+    #   ignore_errors: true
+    #   when: wait_for_job
+
+    # - name: Display all outstanding messages whose job name begin with {{DFS_IMS_SSID}}CTL
+    #   zos_operator_action_query:
+    #     job_name: '{{DFS_IMS_SSID}}CTL'
+    #   register: query_output
+
+    - name: Issue DIS ACT command
+      ims_command:
+        command: /DIS ACT
+        plex:  PLXWZ
+      register: display_cmd_output
+      failed_when: display_cmd_output.msg is not defined
 
     - name: IMS cold start
       ims_command:
         command:  NRE CHECKPOINT 0 FMT ALL
         plex:  '{{ DFS_IMSPlex }}'
         route: '{{ DFS_IMS_SSID }}'
-      when: cold_start
+      when: 
+        - cold_start 
+        - display_cmd_output.msg is defined and "Success" not in display_cmd_output.msg | join
+        # - '"IMS READY" in query_output.actions[0] | join'
+        # - ims_not_up 
+
       register: cold_start_result
 
     # - debug:
@@ -56,14 +82,27 @@
     #     route: '{{ DFS_IMS_SSID }}'
     #   when: cold_start and cold_start_result.stdout.failed
 
+    - name: Check if {{ DFS_IMS_SSID }}HWS already Up
+      zos_operator:
+        cmd: 'd a,{{ DFS_IMS_SSID }}HWS'
+      register: cmd_output
+    - set_fact:
+        icon_not_up: true
+      when: cmd_output.content is defined and "NOT FOUND" in cmd_output.content | join
+
     - name: ICON start
-      zos_job_submit:
-        src: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.JOBS({{ DFS_IMS_SSID }}HWS1)"
-        location: DATA_SET
-        wait: "{{ zos_job_submit_wait }}"
-        wait_time_s: "{{ zos_job_submit_wait_s }}"
-        return_output: "{{ zos_job_submit_return_output }}"
-      when: icon == "start"
+      command: "jsub {{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.JOBS({{ DFS_IMS_SSID }}HWS1)"
+      # zos_job_submit: 
+      #   max_rc: 16
+      #   src: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.JOBS({{ DFS_IMS_SSID }}HWS1)"
+      #   location: DATA_SET
+      #   wait: "{{ zos_job_submit_wait }}"
+      #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+      #   return_output: "{{ zos_job_submit_return_output }}"
+      when: 
+        - icon == "start"
+        - icon_not_up
+
 
     # Start IMS Connect, for some reason, it doesn't work
     # - name: Start ICON
@@ -77,7 +116,7 @@
       zos_operator:
         cmd: 'c {{ DFS_IMS_SSID }}HWS'
         verbose: true
-      when: icon == "stop"
+      when: icon == "stop" and not icon_not_up
 
   # always:
   #   - name: Delete the temporary submit_jcl script path
