@@ -25,7 +25,6 @@ tags:
   - ims
   - zos_ims
   - z_and_cloud_modernization_stack_operator
-  - zoscb
 dependencies:
   ibm.ibm_zos_core: '>=1.3.5'
   ibm.ibm_zos_ims: '>=1.2.0'
@@ -50,16 +49,9 @@ build_ignore:
   - .travis.yml 
   - ansible.cfg.saved 
   - CHANGELOG.md 
-  - no-ansible.cfg
-  - run-delete-ims-datasets
-  - run-deprov-wazi 
-  - run-prov-wazi 
-  - update-operator.sh 
   - build
   - Jenkinsfile
   - ansible-lint-config.yml
   - Dockerfile 
-  - playbooks/test.yml
-  - playbooks/delete-ims-datasets.yml
   - .whitesource
   
