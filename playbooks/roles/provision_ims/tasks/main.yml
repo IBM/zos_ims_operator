@@ -10,7 +10,7 @@
 
   block:
 
-    - set_fact:
+    # - set_fact:
         # ODBM_JOB_CARD: |-
         #   //{{ DFS_IMS_SSID }}ODBM JOB 'testing',
         #   //*  NOTIFY={{ TARGET_USERNAME | upper }},
