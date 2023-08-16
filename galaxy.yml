@@ -36,6 +36,7 @@ license_file: LICENSE
 # requirements as 'namespace' and 'name'
 # IMPORTANT: Remove zoscb tag if you don't wish for the operator to be publicly shown in z/OS Cloud Broker's Import page. 
 # If the collection is built with this tag and uploaded to Ansible Galaxy, it will show up in z/OS Cloud Broker's Import page for the public to use.
+tags:
   - ibm
   - z
   - zos
