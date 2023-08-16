@@ -1,0 +1,3 @@
+/.openshiftLogs
+*.tar.gz
+local/
