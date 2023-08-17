@@ -55,55 +55,48 @@ resources:
           the IBM Z and Cloud Modernization Stack - IMS Operator version selected. 
           I certify that I have read and accept the terms of the IBM® license that covers the deployment of this software.
       
-      - name: Required IMS Configuration
-        displayName: Optional z/OS Configuration 
-        description: More advanced z/OS configuation options 
-        type: object
-        array: false
+      - name: DFS_IMS_SSID
+        displayName: SSID
+        description: The IMSID of this instance (https://ibm.biz/BdPbuM)
+        type: string
         required: true
-        objectVariables: 
-          - name: DFS_IMS_SSID
-            displayName: SSID
-            description: The IMSID of this instance (https://ibm.biz/BdPbuM)
-            type: string
-            required: true
-            default: IMWZ
-          - name: ODBM_PORTID
-            displayName: IMS ODBM Port
-            description: IMS Open Database Port (https://ibm.biz/BdPbuS)
-            required: true
-            type: number
-            default: 9800
-          - name: ODBM_SSLPORTID
-            displayName: IMS ODBM TLS Port
-            description: IMS Open Database Secure Port (https://ibm.biz/BdPbuS)
-            required: true
-            type: number
-            default: 9801
-          - name: IMS_CONNECT_PORT
-            displayName: IMS Connect Port
-            description: The IMS Connect Port (https://ibm.biz/BdPbuK)
-            required: true
-            type: number
-            default: 9900
-          - name: IMS_CONNECT_SSLPORT
-            displayName: IMS Connect TLS Port
-            description: The IMS Connect Secure Port (https://ibm.biz/BdPbuK)
-            required: true
-            type: number
-            default: 9901
-          - name: DFS_IMSPlex
-            displayName: IMSPLEX
-            description: The IMSPlex that this IMS instance joins (https://ibm.biz/BdPbua)
-            required: true
-            type: string
-            default: PLXWZ
-          - name: DFS_workingdir
-            displayName: Temporary working directory
-            description: Temporary working directory on USS for the IMS Operator
-            required: true
-            type: string
-            default: '/u/ibmuser'
+        default: IMWZ
+      - name: ODBM_PORTID
+        displayName: IMS ODBM Port
+        description: IMS Open Database Port (https://ibm.biz/BdPbuS)
+        required: true
+        type: number
+        default: 9800
+      - name: ODBM_SSLPORTID
+        displayName: IMS ODBM TLS Port
+        description: IMS Open Database Secure Port (https://ibm.biz/BdPbuS)
+        required: true
+        type: number
+        default: 9801
+      - name: IMS_CONNECT_PORT
+        displayName: IMS Connect Port
+        description: The IMS Connect Port (https://ibm.biz/BdPbuK)
+        required: true
+        type: number
+        default: 9900
+      - name: IMS_CONNECT_SSLPORT
+        displayName: IMS Connect TLS Port
+        description: The IMS Connect Secure Port (https://ibm.biz/BdPbuK)
+        required: true
+        type: number
+        default: 9901
+      - name: DFS_IMSPlex
+        displayName: IMSPLEX
+        description: The IMSPlex that this IMS instance joins (https://ibm.biz/BdPbua)
+        required: true
+        type: string
+        default: PLXWZ
+      - name: DFS_workingdir
+        displayName: Temporary working directory
+        description: Temporary working directory on USS for the IMS Operator
+        required: true
+        type: string
+        default: '/u/ibmuser'
 
       - name: Optional IMS Configuration 
         displayName: Optional IMS Configuration 
