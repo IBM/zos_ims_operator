@@ -14,7 +14,7 @@
         cmd: 'd a,{{ DFS_IMS_SSID }}CTL'
       register: ctl_output
 
-    # IMS already up, instance not in 'failedDup', and a reconcile comes in, try to reconcile
+    # IMS already up, a reconcile comes in, try to reconcile
     - block:
         - debug: 
             msg: 'IMS {{ DFS_IMS_SSID }} already up. Trying to reconcile....'
@@ -24,9 +24,8 @@
       when: 
         - reconcile_run
         - ctl_output.content is defined and "NOT FOUND" not in ctl_output.content | join
-        # - tmdb_cr_instance.resources[0].status.run_result is defined and tmdb_cr_instance.resources[0].status.run_result != 'failedDup'
 
-    # IMS already up and a new/recon 'Create' comes in, fail it with 'failedDup' status
+    # IMS already up and a new 'Create' comes in, fail it with 'failedDup' status
     - block:
         - name: Update CR instance run status
           include_role:

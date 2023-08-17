@@ -20,7 +20,7 @@
       #   vars:
       #     path: '{{ eager_role_path }}/templates/DFSALCAT.j2'
 
-      # when: catalog == "allocate" and not reconcile_run
+      # when: catalog == "allocate" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
     - name: 'Catalog already exists?'
       zos_find:
@@ -92,7 +92,7 @@
             setup: true
       register: response
       ignore_errors: true
-      when: catalog == "load" and not reconcile_run
+      when: catalog == "load" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
     - fail: 
         msg: '{{response.stderr}}'
@@ -138,7 +138,7 @@
           type: SEQ
       register: response
       ignore_errors: true
-      when: catalog == "update" and not reconcile_run
+      when: catalog == "update" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
     - fail: 
         msg: '{{response.stderr}}'
@@ -165,7 +165,7 @@
           - '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.SDFSRESL'
       register: response
       ignore_errors: true
-      when: catalog == "setup" and not reconcile_run
+      when: catalog == "setup" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
     - fail: 
         msg: '{{response}}'

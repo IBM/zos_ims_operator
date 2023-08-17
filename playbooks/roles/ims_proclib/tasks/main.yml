@@ -19,7 +19,7 @@
       #   vars:
       #     path: '{{ eager_role_path }}/templates/DFSE302J.j2'
 
-      # when: add and not reconcile_run
+      # when: add and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
     - name: Add IMS procs
       command: 'jsub -f {{ uss_file_path }}/DFSE302J.j2'
@@ -30,7 +30,24 @@
       #   wait: "{{ zos_job_submit_wait }}"
       #   wait_time_s: "{{ zos_job_submit_wait_s }}"
       #   return_output: "{{ zos_job_submit_return_output }}"
-      when: add and not reconcile_run
+      when: add and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+
+    # - debug:
+    #     msg:
+    #       - 'add is {{add}}'
+    #       - 'reconcile_run is {{reconcile_run}}'
+    #       - 'run_result is {{tmdb_cr_instance.resources[0].status.run_result}}'
+
+    # - name: Add IMS procs if reconcile failedDup
+    #   command: 'jsub -f {{ uss_file_path }}/DFSE302J.j2'
+    #   # zos_job_submit: 
+    #   #   max_rc: 16
+    #   #   src: '{{ uss_file_path }}/DFSE302J.j2'
+    #   #   location: USS
+    #   #   wait: "{{ zos_job_submit_wait }}"
+    #   #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+    #   #   return_output: "{{ zos_job_submit_return_output }}"
+    #   when: add and reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup'
 
     # Add ADDS THE BPECONFG MEMBER TO IMS PROCLIB.
     # THIS MEMBER DEFINES THE CONFIGURATION FILE FOR BPE WITH
@@ -45,7 +62,7 @@
       #   vars:
       #     path: '{{ eager_role_path }}/templates/DFSE303J.j2'
 
-      # when: bpeconfg and not reconcile_run
+      # when: bpeconfg and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
     - name: Define IMS subcomponents
       command: 'jsub -f {{ uss_file_path }}/DFSE303J.j2'
@@ -69,7 +86,7 @@
       #   vars:
       #     path: '{{ eager_role_path }}/templates/DFS4CPYP.j2'
 
-      # when: copy and not reconcile_run
+      # when: copy and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
     - name: Copy procs in IMS PROCLIB
       command: 'jsub -f {{ uss_file_path }}/DFS4CPYP.j2'
@@ -80,7 +97,18 @@
       #   wait: "{{ zos_job_submit_wait }}"
       #   wait_time_s: "{{ zos_job_submit_wait_s }}"
       #   return_output: "{{ zos_job_submit_return_output }}"
-      when: copy and not reconcile_run
+      when: copy and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+
+    # - name: Copy procs in IMS PROCLIB for failedDup instance
+    #   command: 'jsub -f {{ uss_file_path }}/DFS4CPYP.j2'
+    #   # zos_job_submit: 
+    #   #   max_rc: 16
+    #   #   src: '{{ uss_file_path }}/DFS4CPYP.j2'
+    #   #   location: USS
+    #   #   wait: "{{ zos_job_submit_wait }}"
+    #   #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+    #   #   return_output: "{{ zos_job_submit_return_output }}"
+    #   when: copy and reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup'
 
 
     # - block:
@@ -93,7 +121,7 @@
       #   vars:
       #     path: '{{ eager_role_path }}/templates/DFSE313J.j2'
 
-      # when: copy_to_jobs and not reconcile_run
+      # when: copy_to_jobs and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
     - name: Copy procs to jobs dataset
       command: 'jsub -f {{ uss_file_path }}/DFSE313J.j2'
@@ -104,7 +132,7 @@
       #   wait: "{{ zos_job_submit_wait }}"
       #   wait_time_s: "{{ zos_job_submit_wait_s }}"
       #   return_output: "{{ zos_job_submit_return_output }}"
-      when: copy_to_jobs and not reconcile_run
+      when: copy_to_jobs and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
 
     # - block:
@@ -117,7 +145,7 @@
       #   vars:
       #     path: '{{ eager_role_path }}/templates/DFSCPYST.j2'
 
-      # when: copy_stage_libs and not reconcile_run
+      # when: copy_stage_libs and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
     - name: Copy staging libs
       command: 'jsub -f {{ uss_file_path }}/DFSCPYST.j2'
@@ -128,7 +156,7 @@
       #   wait: "{{ zos_job_submit_wait }}"
       #   wait_time_s: "{{ zos_job_submit_wait_s }}"
       #   return_output: "{{ zos_job_submit_return_output }}"
-      when: copy_stage_libs and not reconcile_run
+      when: copy_stage_libs and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
 
     # - block:
@@ -141,7 +169,7 @@
       #   vars:
       #     path: '{{ eager_role_path }}/templates/DFSPROCB.j2'
 
-      # when: create_sample and not reconcile_run
+      # when: create_sample and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
     - name: Create additional sample procedures
       command: 'jsub -f {{ uss_file_path }}/DFSPROCB.j2'

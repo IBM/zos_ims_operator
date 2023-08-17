@@ -638,7 +638,7 @@
       #   vars:
       #     template_path: '{{ eager_role_path }}/templates/DFSDYNAL.j2'
 
-      # when: system_datasets == "allocate" and not reconcile_run
+      # when: system_datasets == "allocate" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
     - name: Dynamically allocate IMS system datasets
       command: 'jsub -f {{ uss_file_path }}/DFSDYNAL.j2'
