@@ -54,51 +54,60 @@ resources:
           Refer to the IBM Z and Cloud Modernization Stack Community page https://ibm.biz/z-modernization-stack-community to read the corresponding license for 
           the IBM Z and Cloud Modernization Stack - IMS Operator version selected. 
           I certify that I have read and accept the terms of the IBM® license that covers the deployment of this software.
-      - name: DFS_IMS_SSID
-        displayName: SSID
-        description: The IMSID of this instance (https://ibm.biz/BdPbuM)
-        type: string
+      
+      - name: Required IMS Configuration
+        displayName: Optional z/OS Configuration 
+        description: More advanced z/OS configuation options 
+        type: object
+        array: false
         required: true
-        default: IMWZ
-      - name: ODBM_PORTID
-        displayName: IMS ODBM Port
-        description: IMS Open Database Port (https://ibm.biz/BdPbuS)
-        required: true
-        type: number
-        default: 9800
-      - name: ODBM_SSLPORTID
-        displayName: IMS ODBM TLS Port
-        description: IMS Open Database Secure Port (https://ibm.biz/BdPbuS)
-        required: true
-        type: number
-        default: 9801
-      - name: IMS_CONNECT_PORT
-        displayName: IMS Connect Port
-        description: The IMS Connect Port (https://ibm.biz/BdPbuK)
-        required: true
-        type: number
-        default: 9900
-      - name: IMS_CONNECT_SSLPORT
-        displayName: IMS Connect TLS Port
-        description: The IMS Connect Secure Port (https://ibm.biz/BdPbuK)
-        required: true
-        type: number
-        default: 9901
-      - name: DFS_IMSPlex
-        displayName: IMSPLEX
-        description: The IMSPlex that this IMS instance joins (https://ibm.biz/BdPbua)
-        required: true
-        type: string
-        default: PLXWZ
-      - name: DFS_workingdir
-        displayName: Temporary working directory
-        description: Temporary working directory on USS for the IMS Operator
-        required: true
-        type: string
-        default: '/u/ibmuser'
-      - name: optionalValues
-        displayName: Optional Configuration 
-        description: More advanced configuation options 
+        objectVariables: 
+          - name: DFS_IMS_SSID
+            displayName: SSID
+            description: The IMSID of this instance (https://ibm.biz/BdPbuM)
+            type: string
+            required: true
+            default: IMWZ
+          - name: ODBM_PORTID
+            displayName: IMS ODBM Port
+            description: IMS Open Database Port (https://ibm.biz/BdPbuS)
+            required: true
+            type: number
+            default: 9800
+          - name: ODBM_SSLPORTID
+            displayName: IMS ODBM TLS Port
+            description: IMS Open Database Secure Port (https://ibm.biz/BdPbuS)
+            required: true
+            type: number
+            default: 9801
+          - name: IMS_CONNECT_PORT
+            displayName: IMS Connect Port
+            description: The IMS Connect Port (https://ibm.biz/BdPbuK)
+            required: true
+            type: number
+            default: 9900
+          - name: IMS_CONNECT_SSLPORT
+            displayName: IMS Connect TLS Port
+            description: The IMS Connect Secure Port (https://ibm.biz/BdPbuK)
+            required: true
+            type: number
+            default: 9901
+          - name: DFS_IMSPlex
+            displayName: IMSPLEX
+            description: The IMSPlex that this IMS instance joins (https://ibm.biz/BdPbua)
+            required: true
+            type: string
+            default: PLXWZ
+          - name: DFS_workingdir
+            displayName: Temporary working directory
+            description: Temporary working directory on USS for the IMS Operator
+            required: true
+            type: string
+            default: '/u/ibmuser'
+
+      - name: Optional IMS Configuration 
+        displayName: Optional IMS Configuration 
+        description: More advanced IMS configuation options 
         type: object
         array: false
         required: false
@@ -107,50 +116,7 @@ resources:
             displayName: Volume
             description: The volume to store IMS datasets
             type: string
-            default: C4IMF1
             required: false 
-          - name: DYNAMICALLY_RESERVE_PORTS
-            displayName: Reserve Ports
-            description: Choose this option if you want IMS ports to be dynamically reserved
-            type: boolean #is a boolean (toggle switch) in operator code
-            default: false
-            required: false 
-          - name: DFS_PORTID
-            displayName: IMS HTTP Port
-            description: The IMS HTTP Port
-            type: number
-            default: 9878
-            required: false 
-          - name: DFS_SSLPORTID
-            displayName: IMS HTTPs Port
-            description: The IMS SSL Port
-            type: number
-            default: 9879
-            required: false
-          - name: DFS_REGION_TCPIPPORT
-            displayName: ICONN HTTP Port
-            description: The IMS Connect Port
-            type: number
-            default: 9877
-            required: false
-          - name: DFS_REGION_SSLTCPIPPORT
-            displayName: ICONN HTTPS Port
-            description: The IMS Connect SSL Port
-            type: number
-            default: 9866
-            required: false
-          - name: JOB_CLASS
-            displayName: Job Class
-            description: The job class
-            type: string
-            default: A
-            required: false
-          - name: MSG_CLASS
-            displayName: Message Class
-            description: The message class
-            type: string
-            default: H
-            required: false
           - name: DFS_AUTH_LIB_SYSHLQ1
             displayName: IMS Source Location 1
             description: The location that contains IMS source files to be installed
@@ -166,13 +132,12 @@ resources:
             displayName: IMS Install Location 1
             description: The first qualifier for the IMS install location
             type: string
-            default: IMSTESTL
+            default: IMSTEST
             required: false
           - name: DFS_AUTH_LIB_HLQ2
             displayName: IMS Install Location 2
             description: The second qualifier for the IMS install location
             type: string
-            default: IMWZ
             required: false
           - name: DFS_SMS_ENVIRONMENT
             displayName: SMS Enabled
@@ -184,17 +149,55 @@ resources:
             displayName: SMS Storage Class
             description: Indicates what storage class the install volume uses (only applicable if SMS managed)
             type: string
-            default: SCNOSMS
-            required: false
-          - name: zCloud_PROCLIB
-            displayName: The IMS PROCLIB
-            description: Location of the IMS PROCLIB
-            type: string
-            default: SYS1.PROCLIB
+            default: SCIMS
             required: false
           - name: STEPLIB
             displayName: The IMS STEPLIB
             description: Location of the IMS PROCLIB
             type: string
             default: DFSF10.SDFSRESL
+            required: false
+
+      - name: Optional z/OS Configuration
+        displayName: Optional z/OS Configuration 
+        description: More advanced z/OS configuation options 
+        type: object
+        array: false
+        required: false
+        objectVariables: 
+          - name: JOB_CLASS
+            displayName: Job Class
+            description: The job class
+            type: string
+            default: A
+            required: false
+          - name: MSG_CLASS
+            displayName: Message Class
+            description: The message class
+            type: string
+            default: H
+            required: false
+          - name: zCloud_PROCLIB
+            displayName: System PROCLIB
+            description: Location of the System PROCLIB
+            type: string
+            default: SYS1.PROCLIB
+            required: false
+          - name: zCloud_LERuntime
+            displayName: System LE Runtime dataset
+            description: Location of the System LE Runtime dataset
+            type: string
+            default: CEE.SCEERUN
+            required: false
+          - name: zCloud_MACLIB
+            displayName: System MACLIB
+            description: Location of the System MACLIB
+            type: string
+            default: SYS1.MACLIB
+            required: false
+          - name: zCloud_CSSLIB
+            displayName: System CSSLIB
+            description: Location of the System CSSLIB
+            type: string
+            default: SYS1.CSSLIB
             required: false

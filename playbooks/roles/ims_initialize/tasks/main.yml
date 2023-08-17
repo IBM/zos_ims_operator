@@ -34,7 +34,7 @@
                 volumes: "{{ DFS_DS_VOLUME1 if not DFS_DS_VOLUME1 == None else omit }}"
                 sms_storage_class: "{{ DFS_SMS_CLASS if DFS_SMS_ENVIRONMENT else omit }}"
 
-            - name: Reserve ICON HTTP Port
+            - name: Reserve ICON TLS Port
               zport:
                 name: '*'
                 dsname: '{{ TCPIP_PROFILE }}'
@@ -50,7 +50,7 @@
                 tcp: yes
               register: port_alloc_result2
 
-            - name: Reserve IMS HTTP Port
+            - name: Reserve IMS TLS Port
               zport:
                 name: '*'
                 dsname: '{{ TCPIP_PROFILE }}'

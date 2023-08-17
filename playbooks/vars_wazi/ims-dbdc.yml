@@ -18,9 +18,9 @@ RESERVE_SPECIFIC_PORT: yes
 ODBM_PORTID: 9800
 ODBM_SSLPORTID: 9801
 
-# HTTP port for IMS Connect
+# TLS port for IMS Connect
 IMS_CONNECT_PORT: 9900
-# HTTPS Port for IMS Connect
+# TLS Port for IMS Connect
 IMS_CONNECT_SSLPORT: 9901
 ZOS_RELEASE: ''
 # location of system tcpip profile
