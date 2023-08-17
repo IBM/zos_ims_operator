@@ -93,7 +93,7 @@
     #       template_path: '{{ eager_role_path }}/templates/provision/*'
     #       uss_file_path: '{{ tmdb_tmp_dir.path }}'
 
-    #   when: not reconcile_run
+    #   when: ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
     - block:
         - name: Copy imsjava to target
@@ -136,7 +136,7 @@
             done
           args:
             chdir: '{{ proclib_tmp_dir.path }}'
-          when: not reconcile_run
+          when: ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
       always:
         - name: Delete the temporary PROCLIB files directory
           file:

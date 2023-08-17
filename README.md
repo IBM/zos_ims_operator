@@ -28,7 +28,7 @@ This Ansible collection must be used with **z/OS Cloud Broker V2.2 or newer.** F
 
 **Customization Guide**
 =========
-Please refer to the [Customization Guide](Customization.md) for more information on implementation details and how to customize this collection for your own environment.
+Please refer to the [Customization Guide](customization-guide.md) for more information on implementation details and how to customize this collection for your own environment.
 
 **Copyright**
 =========

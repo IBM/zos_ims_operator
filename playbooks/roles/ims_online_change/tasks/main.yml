@@ -20,7 +20,7 @@
       #   vars:
       #     path: '{{ eager_role_path }}/templates/DFSENOLC.j2'
 
-      # when: enable_olc and not reconcile_run
+      # when: enable_olc and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
     - name: Enable IMS OLC
       command: 'jsub -f {{ uss_file_path }}/DFSENOLC.j2'
@@ -31,7 +31,7 @@
       #   wait: "{{ zos_job_submit_wait }}"
       #   wait_time_s: "{{ zos_job_submit_wait_s }}"
       #   return_output: "{{ zos_job_submit_return_output }}"
-      when: enable_olc and not reconcile_run
+      when: enable_olc and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
 
     # - block:
@@ -44,7 +44,7 @@
       #   vars:
       #     path: '{{ eager_role_path }}/templates/DFS4ACTV.j2'
 
-      # when: active_libs and not reconcile_run
+      # when: active_libs and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
       # - name: Enable IMS OLC
       #   zos_copy:
@@ -63,4 +63,4 @@
       #   wait: "{{ zos_job_submit_wait }}"
       #   wait_time_s: "{{ zos_job_submit_wait_s }}"
       #   return_output: "{{ zos_job_submit_return_output }}"
-      when: active_libs and not reconcile_run
+      when: active_libs and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )

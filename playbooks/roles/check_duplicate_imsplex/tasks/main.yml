@@ -14,7 +14,7 @@
           cmd: 'D XCF,GROUP,CSL{{DFS_IMSPlex}}'
         register: cmd_output
 
-      # Reconcile run and instance not in 'failedDup' status
+      # Reconcile run, try to reconcile
       - block:
           - debug: 
               msg: 'IMSPLEX {{DFS_IMSPlex}} already Up. Trying to reconcile...'
@@ -23,9 +23,8 @@
           - reconcile_run
           - cmd_output.content[3] is defined
           - '"NOT DEFINED" not in cmd_output.content[3] | join'
-          # - tmdb_cr_instance.resources[0].status.run_result is defined and tmdb_cr_instance.resources[0].status.run_result != 'failedDup'
 
-      # IMSPex already up and a new/recon 'Create' comes in, fail it with 'failedDup' status
+      # IMSPex already up and a new 'Create' comes in, fail it with 'failedDup' status
       - block: 
         - name: Update CR instance run status
           include_role:

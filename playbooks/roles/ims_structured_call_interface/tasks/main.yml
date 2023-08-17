@@ -43,7 +43,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: sci == "config" and not reconcile_run
+      when: sci == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') ) 
 
 
     - name: Add CSLSI000 member to PROCLIB
@@ -64,7 +64,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: sci == "config" and not reconcile_run
+      when: sci == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
 
     - name: Add SCI PROC member to PROCLIB
@@ -85,7 +85,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: sci == "config" and not reconcile_run
+      when: sci == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
     - block:
 

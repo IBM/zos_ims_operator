@@ -1,16 +1,28 @@
 # IMS Provisioning for Wazi environment
 
-The IMS provisioning playbook samples demonstrate how to allocate the required
+The IMS provisioning operator playbooks demonstrate how to allocate the required
 data sets and configure them to provision IMS and related services.
 
-It is a good practice to review the playbook sample contents before executing
+It is a good practice to review the playbook contents before executing
 them. It will help you understand the requirements in terms of space, location,
 names, authority, and the artifacts that will be created and cleaned up.
-Although samples are written to operate without the need for the user’s
-configuration, flexibility is written into the samples because it is not easy
-to determine if a sample has access to the host’s resources. Review the
+Although playbooks are written to operate without the need for the user’s
+configuration, flexibility is written into the playbooks because it is not easy
+to determine if a playbook has access to the host’s resources. Review the
 playbook notes sections for additional details and configuration.
 
+## Requirements
+* IBM z/OS core collection 1.5.0
+* IBM z/OS IMS collection 1.2.0
+* IBM® Wazi Sandbox 2.4 or IBM® Extended z/OS® ADCD for Z Development and Test Environment built upon the general release of ADCD z/OS® V2R5 December Edition of 2022 or later
+  
+## Getting Started
+
+Consult the [Operator Collection SDK](https://github.com/IBM/operator-collection-sdk) for basic concepts and tutorials before modifying this collection for your own use. 
+
+## Operator-level customization
+- In **galaxy.yml**, update the *name*, *namespace*, *version*, *description*, *authors*, and *dependencies* variables to match your specifications
+- In **operator-config.yml**, update the *name*, *displayName*, *domain*, *version*, *description*, *icon*, and *resources* variable to match your specifications
 
 ## Playbook Summary
 
@@ -88,19 +100,7 @@ Inside each role:
 * `./tasks/main.yml` contains the default tasks performed by the role.
 
 
-## Requirements
-* IBM z/OS core collection 1.5.0
-* IBM z/OS IMS collection 1.2.0
-* IBM® Wazi Sandbox 2.4 or IBM® Extended z/OS® ADCD for Z Development and Test Environment built upon the general release of ADCD z/OS® V2R5 December Edition of 2022 or later
-
-## Getting Started
-
-Consult the [Operator Collection SDK](https://github.com/IBM/operator-collection-sdk) for basic concepts and tutorials before modifying this collection for your own use. 
-
 ## Copyright
 
 © Copyright IBM Corporation 2023
-
-## License
-Licensed under [Apache License](https://opensource.org/licenses/Apache-2.0).
 

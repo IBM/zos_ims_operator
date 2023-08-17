@@ -53,7 +53,7 @@
     - name: Issue DIS ACT command
       ims_command:
         command: /DIS ACT
-        plex:  PLXWZ
+        plex: '{{ DFS_IMSPlex }}'
       register: display_cmd_output
       failed_when: display_cmd_output.msg is not defined
 

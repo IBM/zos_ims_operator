@@ -44,7 +44,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: rm == "config" and not reconcile_run
+      when: rm == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
     - name: Add CSLRI000 member
       zos_mvs_raw:
@@ -64,7 +64,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: rm == "config" and not reconcile_run
+      when: rm == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
     - name: Add RM member to PROCLIB
       zos_mvs_raw:
@@ -84,7 +84,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: rm == "config" and not reconcile_run
+      when: rm == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
     # Start RM
     - name: Start RM

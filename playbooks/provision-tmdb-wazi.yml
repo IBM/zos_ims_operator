@@ -22,7 +22,6 @@
       ansible.builtin.fail:
         msg: Product license was not accepted
       when: not accept
-      # when: k8s_managed and not accept
 
     - include_role:
         name: set_up_run_environment
@@ -52,12 +51,43 @@
 
       when: not reconcile_run
 
+    # This block is for handling faildDup reconcile event
+    - block:  
+        - name: Delete the temporary provision files directory {{ tmdb_tmp_dir.path }}
+          file:
+            path: "{{ tmdb_tmp_dir.path }}"
+            state: absent
+
+        - name: send all templates to host
+          include_role:
+            name: send_all_templates
+
+        - name: Provisioning starting.... this is reconciling a failedDup instance
+          include_role:
+            name: update_instance_status
+          vars:
+            status_key: 'run_result'
+            status_val: 'Provisioning in progress...'
+            instance_kind: TMDB
+          when: tmdb_cr_instance.resources[0].status.run_result is not defined
+
+        - name: Saving templates location....
+          include_role:
+            name: update_instance_status
+          vars:
+            status_key: 'templates_path'
+            status_val: '{{tmdb_tmp_dir}}'
+            instance_kind: TMDB
+
+      when: 
+       - reconcile_run
+       - tmdb_cr_instance.resources[0].status.run_result == 'failedDup'
+
     - name: Validate user inputs
       include_role: 
         name: check_inputs
       vars:
         fail_task: true
-      # when: k8s_managed
 
     - block:
       - name: Check if IMS already up
@@ -73,6 +103,7 @@
           name: check_port
         vars:
           in_reconcile_mode: '{{reconcile_run}}'
+        when: not reconcile_run
 
       - include_role:
           name: provision_ims
@@ -92,10 +123,6 @@
         - block:
           - debug:  
               msg: 'temp dir to delete: {{tmdb_tmp_dir.path}}'
-        # - name: Delete the temporary provision files directory
-        #   file:
-        #     path: "{{ tmdb_tmp_dir.path }}"
-        #     state: absent
       vars:
         uss_file_path: '{{ tmdb_tmp_dir.path }}'
   handlers:
