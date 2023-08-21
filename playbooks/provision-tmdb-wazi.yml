@@ -28,9 +28,9 @@
 
     # This block is for handling 'Create' event
     - block:  
-        - name: send all templates to host
-          include_role:
-            name: send_all_templates
+        # - name: send all templates to host
+        #   include_role:
+        #     name: send_all_templates
 
         - name: Provisioning starting.... this is a new instance
           include_role:
@@ -58,9 +58,9 @@
             path: "{{ tmdb_tmp_dir.path }}"
             state: absent
 
-        - name: send all templates to host
-          include_role:
-            name: send_all_templates
+        # - name: send all templates to host
+        #   include_role:
+        #     name: send_all_templates
 
         - name: Provisioning starting.... this is reconciling a failedDup instance
           include_role:
@@ -103,7 +103,12 @@
           name: check_port
         vars:
           in_reconcile_mode: '{{reconcile_run}}'
-        when: not reconcile_run
+        when: not reconcile_run or ( reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup')
+
+      - name: send all templates to host
+        include_role:
+          name: send_all_templates
+        when: not reconcile_run or ( reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup')
 
       - include_role:
           name: provision_ims

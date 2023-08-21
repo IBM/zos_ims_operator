@@ -1,4 +1,5 @@
 ###############################################################################
 # © Copyright IBM Corporation 2023
 ###############################################################################
-# vars file for check_duplicate_ims
+# vars file for check_duplicate_imsplex
+imsplex_is_up: false

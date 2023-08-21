@@ -12,15 +12,15 @@
 
       - block:
 
-        - set_fact:
-            eager_role_path: '{{role_path}}'
+        # - set_fact:
+        #     eager_role_path: '{{role_path}}'
 
-        - include_role:
-            name: send-template
-          vars:
-            path: '{{ eager_role_path }}/templates/DFSGNPRE.j2'
+        # - include_role:
+        #     name: send-template
+        #   vars:
+        #     path: '{{ eager_role_path }}/templates/DFSGNPRE.j2'
 
-          when: preprocess
+        #   when: preprocess
           # when: preprocess and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
         - name: IMS system definition preprocessor utility
@@ -32,19 +32,20 @@
           #   wait: "{{ zos_job_submit_wait }}"
           #   wait_time_s: "{{ zos_job_submit_wait_s }}"
           #   return_output: "{{ zos_job_submit_return_output }}"
-          when: preprocess
+          # when: preprocess
+          when: preprocess and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
       - block:
 
-        - set_fact:
-            eager_role_path: '{{role_path}}'
+        # - set_fact:
+        #     eager_role_path: '{{role_path}}'
 
-        - include_role:
-            name: send-template
-          vars:
-            path: '{{ eager_role_path }}/templates/DFS4STG1.j2'
+        # - include_role:
+        #     name: send-template
+        #   vars:
+        #     path: '{{ eager_role_path }}/templates/DFS4STG1.j2'
 
-          when: stage1
+        #   when: stage1
           # when: stage1 and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
         - name: Sysdef stage 1
@@ -56,20 +57,21 @@
           #   wait: "{{ zos_job_submit_wait }}"
           #   wait_time_s: "{{ zos_job_submit_wait_s }}"
           #   return_output: "{{ zos_job_submit_return_output }}"
-          when: stage1
+          # when: stage1
+          when: stage1 and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
 
       - block:
 
-        - set_fact:
-            eager_role_path: '{{role_path}}'
+        # - set_fact:
+        #     eager_role_path: '{{role_path}}'
 
-        - include_role:
-            name: send-template
-          vars:
-            path: '{{ eager_role_path }}/templates/DFS4STG2.j2'
+        # - include_role:
+        #     name: send-template
+        #   vars:
+        #     path: '{{ eager_role_path }}/templates/DFS4STG2.j2'
 
-          when: stage2
+        #   when: stage2
           # when: stage2 and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
 
@@ -82,4 +84,5 @@
           #   wait: "{{ zos_job_submit_wait }}"
           #   wait_time_s: "{{ zos_job_submit_wait_s }}"
           #   return_output: "{{ zos_job_submit_return_output }}"
-          when: stage2
+          # when: stage2
+          when: stage2 and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )

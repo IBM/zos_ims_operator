@@ -14,15 +14,30 @@
           cmd: 'D XCF,GROUP,CSL{{DFS_IMSPlex}}'
         register: cmd_output
 
-      # Reconcile run, try to reconcile
-      - block:
-          - debug: 
-              msg: 'IMSPLEX {{DFS_IMSPlex}} already Up. Trying to reconcile...'
-          # - meta: end_host
+      - set_fact:
+          imsplex_is_up: true
         when: 
-          - reconcile_run
           - cmd_output.content[3] is defined
           - '"NOT DEFINED" not in cmd_output.content[3] | join'
+
+      # Reconcile run and not failedDup, try to reconcile
+      - block:
+          - name: IMSPLEX {{DFS_IMSPlex}} already Up. Trying to reconcile...
+            debug: 
+              msg: ''
+        when: 
+          - reconcile_run
+          - imsplex_is_up
+          - tmdb_cr_instance.resources[0].status.run_result != 'failedDup'
+
+      # Reconcile run and failedDup, fail it
+      - block:
+          - fail:
+              msg: Duplicate IMSPlex {{ DFS_IMSPlex }}. Please use a different IMSPlex name. 
+        when: 
+          - reconcile_run
+          - imsplex_is_up
+          - tmdb_cr_instance.resources[0].status.run_result == 'failedDup'
 
       # IMSPex already up and a new 'Create' comes in, fail it with 'failedDup' status
       - block: 

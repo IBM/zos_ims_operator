@@ -37,7 +37,7 @@
             msg: port {{ ODBM_PORTID }} is reserved
       when: 
         - '"{{ODBM_PORTID}}" in reserved_port_list.output[0].content  | join' 
-        - not reconcile_run
+        - not reconcile_run or ( reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup')
 
     - block:
         - name: Update CR instance run status
@@ -52,7 +52,7 @@
             msg: port {{ ODBM_PORTID }} is in use
       when: 
         - '"..{{ODBM_PORTID}}" in inuse_port_list.output[0].content  | join' 
-        - not reconcile_run
+        - not reconcile_run or ( reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup')
 
 
     - block:
@@ -68,7 +68,7 @@
             msg: port {{ ODBM_SSLPORTID }} is reserved
       when: 
         - '"{{ODBM_SSLPORTID}}" in reserved_port_list.output[0].content  | join' 
-        - not reconcile_run
+        - not reconcile_run or ( reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup')
 
 
     - block:
@@ -84,7 +84,7 @@
             msg: port {{ ODBM_SSLPORTID }} is in use
       when: 
         - '"..{{ODBM_SSLPORTID}}" in inuse_port_list.output[0].content  | join' 
-        - not reconcile_run
+        - not reconcile_run or ( reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup')
 
 
     - block:
@@ -100,7 +100,7 @@
             msg: port {{ IMS_CONNECT_PORT }} is reserved
       when: 
         - '"{{IMS_CONNECT_PORT}}" in reserved_port_list.output[0].content  | join' 
-        - not reconcile_run
+        - not reconcile_run or ( reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup')
 
 
     - block:
@@ -116,7 +116,7 @@
             msg: port {{ IMS_CONNECT_PORT }} is in use
       when: 
         - '"..{{IMS_CONNECT_PORT}}" in inuse_port_list.output[0].content  | join' 
-        - not reconcile_run
+        - not reconcile_run or ( reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup')
 
 
     - block:
@@ -132,7 +132,7 @@
             msg: port {{ IMS_CONNECT_SSLPORT }} is reserved
       when: 
         - '"{{IMS_CONNECT_SSLPORT}}" in reserved_port_list.output[0].content  | join' 
-        - not reconcile_run
+        - not reconcile_run or ( reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup')
 
 
     - block:
@@ -148,5 +148,5 @@
                 msg: port {{ IMS_CONNECT_SSLPORT }} is in use
       when: 
         - '"..{{IMS_CONNECT_SSLPORT}}" in inuse_port_list.output[0].content  | join' 
-        - not reconcile_run
+        - not reconcile_run or ( reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup')
 
