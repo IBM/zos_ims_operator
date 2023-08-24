@@ -1,4 +1,5 @@
-###############################################################################
-# © Copyright IBM Corporation 2023
-###############################################################################
+#
+# Copyright 2023 IBM Inc. All Rights Reserved
+# SPDX-License-Identifier: Apache-2.0
+#
 # vars file for check_duplicate_ims
