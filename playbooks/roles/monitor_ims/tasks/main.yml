@@ -16,7 +16,7 @@
         command: QUERY IMSPLEX NAME(*) TYPE(OM) SHOW(STATUS)
         plex:  '{{ DFS_IMSPlex }}'
       register: om_status
-      ignore_errors: true
+      #ignore_errors: true
 
     - debug:
         msg: '{{ om_status }}'
@@ -42,7 +42,7 @@
         command: QUERY IMSPLEX NAME(*) TYPE(SCI) SHOW(STATUS)
         plex:  '{{ DFS_IMSPlex }}'
       register: sci_status
-      ignore_errors: true
+      #ignore_errors: true
 
     - debug:
         msg: '{{ sci_status.ims_output[0] }}'
@@ -68,7 +68,7 @@
         command: QUERY IMSPLEX NAME(*) TYPE(RM) SHOW(STATUS)
         plex:  '{{ DFS_IMSPlex }}'
       register: rm_status
-      ignore_errors: true
+      #ignore_errors: true
 
     - debug:
         msg: '{{ rm_status.ims_output[0] }}'
@@ -94,7 +94,7 @@
         command: QUERY IMSCON TYPE(CONFIG) SHOW(ALL)
         plex: '{{ DFS_IMSPlex }}'
       register: imscon_status
-      ignore_errors: true
+      #ignore_errors: true
 
     - debug:
         msg: '{{ imscon_status.ims_output[0] }}'

@@ -10,19 +10,6 @@
 
   block:
 
-    # - block:
-      # - set_fact:
-      #     eager_role_path: '{{role_path}}'
-
-      # # Send the template over
-      # - include_role:
-      #     name: send-template
-      #   vars:
-      #     path: '{{ eager_role_path }}/templates/DFSDFDRC.j2'
-
-      # when: dbrc_defaults and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
-
-
     - name: Specify DBRC defaults
       command: 'jsub -f {{ uss_file_path }}/DFSDFDRC.j2'
       # zos_job_submit: 

@@ -2,19 +2,15 @@
 ###############################################################################
 # © Copyright IBM Corporation 2023
 ###############################################################################
+# The SSID for the IMS to be provisioned
+DFS_IMS_SSID: IMWZ
+
+# IMSPlex name
+DFS_IMSPlex: PLXWZ
+
 # ---------------------------------------------------------------------------- #
 #                               TCPIP information                              #
 # ---------------------------------------------------------------------------- #
-# TCPIP information, including default ports and port reservation behavior
-# Desired port information for IMS 15
-# if DYNAMICALLY_RESERVE_PORTS=yes, playbooks will attempt to reserve ports
-DYNAMICALLY_RESERVE_PORTS: no
-# If DYNAMICALLY_RESERVE_PORTS=yes and RESERVE_SPECIFIC_PORT=yes, playbook will attempt
-# to reserve the port numbers provided below. If any are in use the playbook will fail
-# If DYNAMICALLY_RESERVE_PORTS=yes and RESERVE_SPECIFIC_PORT=no, playbook will reserve an open
-# port within the default range of the Ansible zport module
-RESERVE_SPECIFIC_PORT: yes
-
 ODBM_PORTID: 9800
 ODBM_SSLPORTID: 9801
 
@@ -22,19 +18,6 @@ ODBM_SSLPORTID: 9801
 IMS_CONNECT_PORT: 9900
 # TLS Port for IMS Connect
 IMS_CONNECT_SSLPORT: 9901
-ZOS_RELEASE: ''
-# location of system tcpip profile
-# TCPIP_PROFILE:  SYS1.TCPPARMS(PROFILE)
-TCPIP_PROFILE:  ADCD.{{ZOS_RELEASE}}.TCPPARMS(PROFILE)
-TCPIP_PROFILE_TLS:  ADCD.{{ZOS_RELEASE}}.TCPPARMS(TLSPOLY1)
-# TCPIP_PROFILE_TLS:  IBMUSER.TEST(TLSPOLY1)
-# A dataset is needed to store a TCPIP profile containing
-# changes to the default for dynamic port reservation
-# TCPIP_PROFILE_TMP is the name of the temporary dataset
-# or dataset member to store the profile changes
-TCPIP_PROFILE_TMP_MEMBER: IMSPROF
-# ---------------------------------------------------------------------------- #
-STEPLIB: DFSF10.SDFSRESL
 
 # The API key to use for artifactory repositories
 api_key: ''
@@ -44,8 +27,7 @@ zos_job_submit_wait: false
 zos_job_submit_wait_s: 120
 zos_job_submit_return_output: false
 
-# The SSID for the IMS to be provisioned
-DFS_IMS_SSID: IMWZ
+
 
 # The user ID to use for IMS related provisioning steps
 DFS_IMS_USERID: '{{ TARGET_USERNAME | upper }}'
@@ -70,13 +52,11 @@ DFS_AUTH_LIB_SYSHLQ1: DFSF10
 DFS_AUTH_LIB_SYSHLQ2:
 
 DFS_AUTH_LIB_SYSHLQ:
-# ---------------------------------------------------------------------------- #
 
+ZOS_RELEASE: ''
+
+STEPLIB: '{{DFS_AUTH_LIB_SYSHLQ1}}.SDFSRESL'
 # ---------------------------------------------------------------------------- #
-#                            job related settings                           #
-# ---------------------------------------------------------------------------- #
-JOB_CLASS: A
-MSG_CLASS: H
 
 # ---------------------------------------------------------------------------- #
 #  Common Services related settings                                            #
@@ -89,14 +69,13 @@ OM_CONFIG: false
 
 # Are the volumes we want to use managed by the storage management subsystem (SMS)?
 DFS_SMS_ENVIRONMENT: true
-# DFS_SMS_ENVIRONMENT: false
 
 # ------------------- Storage Management Subsystem settings ------------------ #
 # -------------------------- used when SMS is in use ------------------------- #
-
 # If the volumes are managed by SMS, what SMS storage class should be used?
 # DFS_SMS_CLASS: SCNOSMS       # SCNOSMS does not work as expected
 DFS_SMS_CLASS: SCIMS
+
 # If the volumes are managed by SMS, what SMS management class should be used?
 DFS_SMS_MCLASS: NONE
 
@@ -105,23 +84,9 @@ DFS_SMS_MCLASS: NONE
 
 # first volume to use to store IMS datasets
 DFS_DS_VOLUME1: ''
-# DFS_DS_VOLUME1: USER00
+
 # second volume to use to store IMS datasets
-# DFS_DS_VOLUME2: C4IMF1
 DFS_DS_VOLUME2:
-
-# ---------------------------------------------------------------------------- #
-
-# IMSPlex name
-DFS_IMSPlex: PLXWZ
-
-# The language environment runtime dataset to use
-zCloud_LERuntime: CEE.SCEERUN
-
-zCloud_MACLIB: SYS1.MACLIB
-
-# Dataset containing zos CSS library
-zCloud_CSSLIB: SYS1.CSSLIB
 
 # ---------------------------------------------------------------------------- #
 #                             Java related settings                            #
@@ -138,8 +103,6 @@ DFS_workingdir: /u/{{ TARGET_USERNAME }}
 #                             IMS Discovery Settings                           #
 # ---------------------------------------------------------------------------- #
 HOSTNAME:
-EC_SYSTEM:
-
 
 DFS_INIT_JAVA_CONF: false
 

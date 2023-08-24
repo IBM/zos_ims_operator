@@ -20,36 +20,3 @@
         vars:
           template_path: '{{ eager_role_path }}/templates/provision/*'
           uss_file_path: '{{ tmdb_tmp_dir.path }}'
-
-    # - name: Send PROCLIB members
-    #   block:
-    #     - name: Create temporary directory to store PROCLIB members
-    #       tempfile:
-    #         state: directory
-    #       register: proclib_tmp_dir
-
-    #     - set_fact:
-    #         eager_role_path: '{{role_path}}'
-
-    #     - name: Send PROCLIB member templates to USS directory
-    #       include_role:
-    #         name: send-templates
-    #       vars:
-    #         template_path: '{{eager_role_path}}/templates/procs/*'
-    #         uss_file_path: '{{ proclib_tmp_dir.path }}'
-
-    #     - name: Remove extensions from filenames
-    #       shell: >
-    #         for procname in $(ls *.j2); do
-    #         basename="$(echo ${procname} | cut -d'.' -f1)";
-    #         cp ${procname} "//'{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(${basename})'" ;
-    #         done
-    #       args:
-    #         chdir: '{{ proclib_tmp_dir.path }}'
-    #       when: ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
-    #   always:
-    #     - name: Delete the temporary PROCLIB files directory
-    #       file:
-    #         path: '{{ proclib_tmp_dir.path }}'
-    #         state: absent
-    #   when: send_procs

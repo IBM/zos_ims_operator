@@ -8,6 +8,7 @@
   # * Include different variable files depending on environment/inventory used
   vars_files:
     - vars_wazi/ims-dbdc.yml
+    - vars_wazi/ims-zos.yml
   environment: '{{ system_environment }}'
 
   collections:

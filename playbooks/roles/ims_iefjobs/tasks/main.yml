@@ -11,14 +11,6 @@
   block:
 
     - block:
-      # - set_fact:
-      #     eager_role_path: '{{role_path}}'
-
-      # - include_role:
-      #     name: send-templates
-      #   vars:
-      #     template_path: '{{ eager_role_path }}/templates/IEFJOBSX.j2'
-
       - include_role:
           name: submit-rexx
           public: yes
@@ -27,18 +19,6 @@
           max_rc: 0
 
       when: iefjobs == "delete"
-
-    # - block:
-      # - set_fact:
-      #     eager_role_path: '{{role_path}}'
-
-
-      # - include_role:
-      #     name: send-templates
-      #   vars:
-      #     template_path: '{{ eager_role_path }}/templates/IEFJOBS.j2'
-
-      # when: iefjobs == "create" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
     - include_role:
         name: submit-rexx

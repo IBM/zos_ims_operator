@@ -33,22 +33,7 @@
         cmd: 'c {{ DFS_IMS_SSID }}CTL'
         verbose: true
       when: ctl == "stop" and not ims_not_up
-      ignore_errors: true
-
-    # - name: Wait for IMS ready
-    #   include_role:
-    #     name: submit-rexx
-    #     public: yes
-    #   vars:
-    #     rexx_name: 'WaitJob.j2'
-    #     max_rc: 0
-    #   ignore_errors: true
-    #   when: wait_for_job
-
-    # - name: Display all outstanding messages whose job name begin with {{DFS_IMS_SSID}}CTL
-    #   zos_operator_action_query:
-    #     job_name: '{{DFS_IMS_SSID}}CTL'
-    #   register: query_output
+      #ignore_errors: true
 
     - name: Issue DIS ACT command
       ims_command:
@@ -65,8 +50,6 @@
       when: 
         - cold_start 
         - display_cmd_output.msg is defined and "Success" not in display_cmd_output.msg | join
-        # - '"IMS READY" in query_output.actions[0] | join'
-        # - ims_not_up 
 
       register: cold_start_result
 
@@ -104,12 +87,14 @@
         - icon_not_up
 
 
-    # Start IMS Connect, for some reason, it doesn't work
+    # Start IMS Connect
     # - name: Start ICON
     #   zos_operator:
     #     cmd: 's {{ DFS_IMS_SSID }}HWS1'
     #     verbose: true
-    #   when: icon == "start"
+    #   when: 
+    #     - icon == "start"
+    #     - icon_not_up
 
     # Stop ICON
     - name: Stop ICON
@@ -117,17 +102,3 @@
         cmd: 'c {{ DFS_IMS_SSID }}HWS'
         verbose: true
       when: icon == "stop" and not icon_not_up
-
-  # always:
-  #   - name: Delete the temporary submit_jcl script path
-  #     file:
-  #         path: "{{ response.script_path }}"
-  #         state: absent
-  #     when: response
-  #     ignore_errors: yes
-
-
-
-# - debug:
-#     var: response
-#     verbosity: 0

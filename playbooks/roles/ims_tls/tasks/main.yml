@@ -16,7 +16,7 @@
         commands: 
               - AU IMSUSER NAME('DEFAULT IMS USER') OWNER(SYS1) DFLTGRP(SYS1)
               - ALU IMSUSER OMVS(HOME('/u/imsuser') PROGRAM('/bin/sh') UID(99997))
-      ignore_errors: true
+      #ignore_errors: true
       when: lu_result.output[0].rc > 0
 
     - name: List IMSTLS keyring
@@ -30,7 +30,7 @@
       ibm.ibm_zos_core.zos_tso_command: 
         commands: 
               - RACDCERT ID(IMSUSER) ADDRING(IMSTLSRING)
-      ignore_errors: true
+      #ignore_errors: true
       when: listring_result.output[0].rc > 0
 
     - name: List CERTAUTH
@@ -45,7 +45,7 @@
         commands: 
               - RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) SUBJECTSDN(CN('{{racfcert_label}}') OU('IMS') O('IBM') C('US')) WITHLABEL('{{racfcert_label}}')
               - RACDCERT ID(IMSUSER) CONNECT(CERTAUTH LABEL('{{racfcert_label}}') RING(IMSTLSRING) USAGE(PERSONAL))
-      ignore_errors: true
+      #ignore_errors: true
       when: list_ca_result.output[0].rc > 0
 
     - name: List IMS cert 
@@ -60,7 +60,7 @@
           - RACDCERT ID(IMSUSER)  GENCERT SUBJECTSDN(CN('IMS_Server') OU('IMS') O('IBM') C('US')) WITHLABEL('IMS_Server') SIZE(2048) ALTNAME(DOMAIN('{{zos_hostname}}')) SIGNWITH(CERTAUTH LABEL('{{racfcert_label}}'))
           - RACDCERT ALTER(LABEL('IMS_Server')) ID(IMSUSER) TRUST
           - RACDCERT ID(IMSUSER) CONNECT(RING(IMSTLSRING) LABEL('IMS_Server') DEFAULT)
-      ignore_errors: true
+      #ignore_errors: true
       when: list_ims_cert_result.output[0].rc > 0
 
 
@@ -69,7 +69,7 @@
         commands: 
           - SETROPTS CLASSACT(DIGTCERT DIGTRING)
           - SETROPTS RACLIST(FACILITY DIGTCERT DIGTRING) REFRESH
-      ignore_errors: true
+      #ignore_errors: true
 
     - name: Update pagttls 
       shell: | 
@@ -110,7 +110,7 @@
       #                     TTLSEnabled On
       #                     Trace 2
       #                 }              
-      ignore_errors: true
+      #ignore_errors: true
 
     - name: Refresh PAGENT 
       ibm.ibm_zos_core.zos_operator:
@@ -127,7 +127,7 @@
       #         marker: "## {mark} TLS for {{ port_number}} ##"
       #         marker_begin: " Begin Ansible Block Insert "
       #         marker_end: " End Ansible Block Insert"
-      ignore_errors: true
+      #ignore_errors: true
 
     - name: Refresh PAGENT 
       ibm.ibm_zos_core.zos_operator:

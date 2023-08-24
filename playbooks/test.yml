@@ -8,6 +8,7 @@
   # * Include different variable files depending on environment/inventory used
   vars_files:
     - vars_wazi/ims-dbdc.yml
+    - vars_wazi/ims-zos.yml
   environment: '{{ system_environment }}'
   vars:
     role_path: '/Users/adn/workspaces/nazare/operator-collections/ims/playbooks/roles/ims_dataset'
@@ -166,7 +167,7 @@
   #       managed_acbs:
   #         setup: true
   #   register: response
-  #   ignore_errors: true
+  #   #ignore_errors: true
 
   # - fail: 
   #     msg: '{{response.stderr}}'
@@ -239,7 +240,7 @@
     #   ibm.ibm_zos_core.zos_tso_command: 
     #     commands: 
     #           - LU andy
-    #   # ignore_errors: true
+    #   # #ignore_errors: true
     #   register: lu_result
     #   failed_when: lu_result.output[0].rc > 4
 
@@ -247,7 +248,7 @@
     #   ibm.ibm_zos_core.zos_tso_command: 
     #     commands: 
     #           - RACDCERT ID(IMSUSER) LISTRING(IMSTLSRING2)
-    #   # ignore_errors: true
+    #   # #ignore_errors: true
     #   register: lu_result
     #   failed_when: lu_result.output[0].rc > 4
 

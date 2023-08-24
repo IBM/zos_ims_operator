@@ -12,17 +12,6 @@
 
       - block:
 
-        # - set_fact:
-        #     eager_role_path: '{{role_path}}'
-
-        # - include_role:
-        #     name: send-template
-        #   vars:
-        #     path: '{{ eager_role_path }}/templates/DFSGNPRE.j2'
-
-        #   when: preprocess
-          # when: preprocess and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
-
         - name: IMS system definition preprocessor utility
           command: 'jsub -f {{ uss_file_path }}/DFSGNPRE.j2'
           # zos_job_submit: 
@@ -36,17 +25,6 @@
           when: preprocess and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
       - block:
-
-        # - set_fact:
-        #     eager_role_path: '{{role_path}}'
-
-        # - include_role:
-        #     name: send-template
-        #   vars:
-        #     path: '{{ eager_role_path }}/templates/DFS4STG1.j2'
-
-        #   when: stage1
-          # when: stage1 and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
         - name: Sysdef stage 1
           command: 'jsub -f {{ uss_file_path }}/DFS4STG1.j2'
@@ -62,18 +40,6 @@
 
 
       - block:
-
-        # - set_fact:
-        #     eager_role_path: '{{role_path}}'
-
-        # - include_role:
-        #     name: send-template
-        #   vars:
-        #     path: '{{ eager_role_path }}/templates/DFS4STG2.j2'
-
-        #   when: stage2
-          # when: stage2 and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
-
 
         - name: Sysdef stage 2
           command: 'jsub -f {{ uss_file_path }}/DFS4STG2.j2'

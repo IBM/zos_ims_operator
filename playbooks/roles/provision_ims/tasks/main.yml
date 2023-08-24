@@ -10,18 +10,6 @@
 
   block:
 
-    # - set_fact:
-        # ODBM_JOB_CARD: |-
-        #   //{{ DFS_IMS_SSID }}ODBM JOB 'testing',
-        #   //*  NOTIFY={{ TARGET_USERNAME | upper }},
-        #   //  USER={{ TARGET_USERNAME | upper }},
-        #   //  MSGCLASS={{ MSG_CLASS }},
-        #   //  MSGLEVEL=(1,1),
-        #   //  CLASS={{ JOB_CLASS }}
-
-    # - include_role:
-    #     name: install-bzip2
-
     - include_role:
         name: ims_dataset
       vars:
@@ -126,19 +114,6 @@
         copy_to_jobs: true
         copy_stage_libs: true
         add: true
-
-    # - include_role:
-    #     name: ims_exit
-    #   vars:
-    #     prep_exits: true
-
-    # Run DBD, PSB, and ACB gen
-    # - include_role:
-    #     name: ims_gen
-    #   vars:
-    #     dbd_gen: true
-    #     psb_gen: true
-    #     acb_gen: true
 
     # Generate catalog file after gen
     - include_role:

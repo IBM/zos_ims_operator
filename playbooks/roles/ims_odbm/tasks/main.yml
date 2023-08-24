@@ -12,18 +12,6 @@
         
   block:
 
-    # - block:
-      # - set_fact:
-      #     eager_role_path: '{{role_path}}'
-
-      # # Send the template over
-      # - include_role:
-      #     name: send-template
-      #   vars:
-      #     path: '{{ eager_role_path }}/templates/DFSODBM.j2'
-
-      # when: odbm == "start" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
-
     # Add a role or function to modify JOB_CARD in DFSODBM.j2
 
     - name: Check if {{ DFS_IMS_SSID }}ODBM already Up

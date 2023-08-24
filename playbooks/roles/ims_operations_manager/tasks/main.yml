@@ -25,7 +25,6 @@
         om_config: '{{ role_path }}/templates/om_config.txt'
         rom_config: '{{ role_path }}/templates/rom_config.txt'
 
-    # AL: This code works, but OM doesn't start
     - name: Define BPECONFG
       zos_mvs_raw:
         pgm: IEBGENER

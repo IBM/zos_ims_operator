@@ -25,19 +25,15 @@
       archive:
         path: "{{ temp_file_path.path }}/*"
         dest: "{{ temp_file_path.path }}/templates.tar"
-        # dest: "{{ temp_file_path.path }}/templates.tar.bz2"
-        # format: bz2
         format: tar
       delegate_to: localhost
 
     - name: Copy template archive to target
       copy:
         src: '{{ temp_file_path.path }}/templates.tar'
-        # src: '{{ temp_file_path.path }}/templates.tar.bz2'
         dest: '{{ uss_file_path }}/'
 
     - name: Unarchive templates on target
-      # shell: '{{ uss_utilities_path }}/bzip2 -df templates.tar.bz2; tar -Co . -xf templates.tar ; rm templates.tar'
       shell: 'tar -Co . -xf templates.tar ; rm templates.tar'
       args:
         chdir: '{{ uss_file_path }}'
