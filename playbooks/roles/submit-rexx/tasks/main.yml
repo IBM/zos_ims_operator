@@ -1,7 +1,8 @@
 ---
-###############################################################################
-# © Copyright IBM Corporation 2023
-###############################################################################
+#
+# Copyright 2023 IBM Inc. All Rights Reserved
+# SPDX-License-Identifier: Apache-2.0
+#
 - name: Update file permissions for rexx script
   file:
     path: '{{ uss_file_path }}/{{ rexx_name }}'
