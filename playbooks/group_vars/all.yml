@@ -1,5 +1,5 @@
-ansible_python_interpreter:  /usr/lpp/IBM/cyp/v3r10/pyz/bin/python3
-PYZ: /usr/lpp/IBM/cyp/v3r10/pyz
+ansible_python_interpreter:  /usr/lpp/IBM/cyp/pyz/bin/python
+PYZ: /usr/lpp/IBM/cyp/pyz
 ZOAU: /usr/lpp/IBM/zoautil
 JAVA: /usr/lpp/java/java180/J8.0_64/bin
 COBOL: /usr/lpp/cobol/cob630/igyv6r3/bin
