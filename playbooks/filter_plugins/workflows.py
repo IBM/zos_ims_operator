@@ -1,3 +1,7 @@
+#
+# Copyright 2023 IBM Inc. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
