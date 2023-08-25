@@ -84,23 +84,30 @@
           - name: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}CTL)'
             state: absent
             type: MEMBER
+            force: true
           - name: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}DLI)'
             state: absent
             type: MEMBER
+            force: true
           - name: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}DRC)'
             state: absent
             type: MEMBER
+            force: true
           - name: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}OM)'
             state: absent
             type: MEMBER
+            force: true
           - name: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}SCI)'
             state: absent
             type: MEMBER
+            force: true
           - name: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}RM)'
             state: absent
             type: MEMBER
+            force: true
           - name: '{{ zCloud_PROCLIB }}({{ DFS_IMS_SSID }}ODBM)'
             state: absent
             type: MEMBER
+            force: true
       when: delete
       #ignore_errors: true

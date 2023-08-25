@@ -8,11 +8,18 @@
   collections:
     - ibm.ibm_zos_core
     - ibm.ibm_zos_ims
+  vars:
+    ims_not_up: false
 
   block:
+    - name: Check if {{ DFS_IMS_SSID }}CTL already Up
+      zos_operator:
+        cmd: 'd a,{{ DFS_IMS_SSID }}CTL'
+      register: cmd_output
 
-    # - include_role:
-    #     name: install-bzip2
+    - set_fact:
+        ims_not_up: true
+      when: cmd_output.content is defined and "NOT FOUND" in cmd_output.content | join
 
 
     - name: Stop all IMS resources
@@ -27,14 +34,16 @@
           - command: STOP DB ALL
             plex: '{{ DFS_IMSPlex }}'
             route: '{{ DFS_IMS_SSID }}'
-      #ignore_errors: true
+       # ignore_errors: true
+      when: not ims_not_up
 
     - name: Immediate IMS Shutdown
       ims_command:
         command: CHE FREEZE
         plex: '{{ DFS_IMSPlex }}'
         route: '{{ DFS_IMS_SSID }}'
-      #ignore_errors: true
+      # ignore_errors: true
+      when: not ims_not_up
 
     # Stop ICON
     - block:

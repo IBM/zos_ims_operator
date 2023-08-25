@@ -20,19 +20,91 @@
 
   tasks:
   - block:
+    # - name: Create ACBs for catalog setup
+    #   ibm.ibm_zos_ims.ims_acb_gen:
+    #     command_input: BUILD
+    #     psb_name:
+    #       - DFSCPL00
+    #       - DFSCP000
+    #       - DFSCP001
+    #     dbd_name:
+    #       - DFSCD000
+    #       - DFSCX000
+    #     psb_lib: 'IMSTEST.IMWZ.PSBLIB'
+    #     dbd_lib: 'IMSTEST.IMWZ.DBDLIB'
+    #     acb_lib: 'IMSTEST.IMWZ.ACBLIB'
+    #     reslib:
+    #       - 'IMSTEST.IMWZ.SDFSRESL'
+    #     steplib:
+    #       - 'IMSTEST.IMWZ.SDFSRESL'
+    #   register: response
 
-      - name: Check if IMSPLEX PLXAD already Up
-        ims_command:
-          command: /DIS ACT
-          plex:  PLXWZ
-        register: qry_result
+      - name: Find joblog for {{DFS_IMS_SSID}}CTL
+        zos_job_output:
+          job_name: "IMWACTL"
+          ddname: "JESMSGLG"
+        register: dd_output
+
+      - name: Get active {{DFS_IMS_SSID}}CTL joblog
+        set_fact: 
+          active_ctl_msg: '{{item.ddnames[0].content}}'
+        when: 
+         - item.system != None and item.asid != "0"
+        with_items: '{{dd_output.jobs}}'
 
       - debug:
-          msg: '{{qry_result.msg}}'
-        # when: display_cmd_output.ims_output[0].msg != 'Success' 
-      - fail:
-          msg: 'fail'
-        when: qry_result.msg is defined and "Success" in qry_result.msg | join
+          var: active_ctl_msg
+
+      # - name: Issue IMS /ERE OVERRIDE.
+      #   ims_command:
+      #     command:  "ERE OVERRIDE."
+      #     plex:  PLXWA
+      #     route: IMWA
+      #   when: '"DUPLICATE ENTRY ON SIGNON REQUEST" in active_ctl_msg | join'
+
+      # - name: Issue IMS /ERE
+      #   ims_command:
+      #     command:  "ERE."
+      #     plex:  PLXWA
+      #     route: IMWA
+      #   when: '"EMERGENCY RESTART IS REQUIRED" in active_ctl_msg | join'
+
+      # - name: Issue /DIS ACT command
+      #   ims_command:
+      #     command: /DIS ACT
+      #     plex:  PLXWA
+      #     route: IMWA
+      #   register: display_result
+
+      # - name: Clean zCloud PROCLIB
+      #   zos_data_set:
+      #     batch:
+      #       - name: 'IMSTEST.IMWA.PROCLIB(IMWAOM)'
+      #         state: absent
+      #         type: MEMBER
+      #         force: true
+
+      # - name: Stop all IMS resources
+      #   ims_command:
+      #     batch:
+      #       - command: QRY IMSPLEX SHOW(ALL)
+      #         plex: PLXWA
+      #         route: IMWA
+            # - command: STOP TRAN ALL
+            #   plex: PLXWA
+            #   route: IMWA
+            # - command: STOP DB ALL
+            #   plex: PLXWA
+            #   route: IMWA
+
+      
+
+      # - debug:
+      #     msg: '{{qry_result.msg}}'
+      #   # when: display_cmd_output.ims_output[0].msg != 'Success' 
+      # - fail:
+      #     msg: 'fail'
+      #   when: qry_result.msg is defined and "Success" in qry_result.msg | join
 
       # - name: Display all outstanding messages whose job name begin with {{DFS_IMS_SSID}}CTL
       #   zos_operator_action_query:
