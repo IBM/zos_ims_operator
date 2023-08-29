@@ -113,11 +113,3 @@
         #   return_output: "{{ zos_job_submit_return_output }}"
 
       when: imscon_status.failed
-
-    - name: Update CR instance run status
-      include_role:
-        name: update_instance_status
-      vars:
-        status_val: 'provisioning done...'
-        status_key: 'run_result'
-        instance_kind: TMDB

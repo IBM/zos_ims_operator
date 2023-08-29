@@ -103,4 +103,4 @@
             state: absent
             type: MEMBER
       when: delete
-      #ignore_errors: true
+      ignore_errors: true
