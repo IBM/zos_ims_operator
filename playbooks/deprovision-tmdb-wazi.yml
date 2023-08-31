@@ -18,11 +18,9 @@
     - operator_sdk.util
 
   tasks:
-    - include_role:
-        name: set_up_run_environment
 
     - block:
-        # Do not de-provision IMS if the instance is in 'failedDup' status
+        # Do not de-provision IMS if the instance is in 'failedInputValidation' status
         - block:
             - name: Failed duplicate instance found. No de-provisioning. Exiting....
               debug: 
@@ -30,8 +28,19 @@
             - meta: end_host
           when: 
             - tmdb_cr_instance.resources[0].status.run_result is defined 
-            - tmdb_cr_instance.resources[0].status.run_result == 'failedDup'
+            - tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation'
             # - k8s_managed
+
+        - name: Deprovisioning starting.... 
+          include_role:
+            name: update_instance_status
+          vars:
+            status_key: 'run_result'
+            status_val: 'Deprovisioning in progress...'
+            instance_kind: TMDB
+
+        - include_role:
+            name: set_up_run_environment
 
         - include_role:
             name: deprovision_ims
@@ -49,7 +58,7 @@
           file:
             path: "{{ tmdb_tmp_dir.path }}"
             state: absent
-          when: tmdb_cr_instance.resources[0].status.run_result is defined and tmdb_cr_instance.resources[0].status.run_result == 'Deprovision completed'
+          # when: tmdb_cr_instance.resources[0].status.run_result is defined and tmdb_cr_instance.resources[0].status.run_result == 'Deprovision completed'
 
       vars:
         uss_file_path: '{{ tmdb_tmp_dir.path }}'

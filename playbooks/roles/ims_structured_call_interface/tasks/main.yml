@@ -44,7 +44,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: sci == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') ) 
+      when: sci == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') ) 
 
 
     - name: Add CSLSI000 member to PROCLIB
@@ -65,7 +65,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: sci == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+      when: sci == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
 
     - name: Add SCI PROC member to PROCLIB
@@ -86,7 +86,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: sci == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+      when: sci == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
     - block:
 

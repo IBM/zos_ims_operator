@@ -44,7 +44,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: om == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+      when: om == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
     - name: Add CSLOI000 member
       zos_mvs_raw:
@@ -64,7 +64,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: om == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+      when: om == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
     - name: Add OM member to PROCLIB
       zos_mvs_raw:
@@ -84,7 +84,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: om == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+      when: om == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
     - name: Add CSLOIROM member
       zos_mvs_raw:
@@ -104,7 +104,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: om == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+      when: om == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
     # Start OM
     - name: Start OM

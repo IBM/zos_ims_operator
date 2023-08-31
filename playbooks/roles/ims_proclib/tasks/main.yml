@@ -19,7 +19,7 @@
       #   wait: "{{ zos_job_submit_wait }}"
       #   wait_time_s: "{{ zos_job_submit_wait_s }}"
       #   return_output: "{{ zos_job_submit_return_output }}"
-      when: add and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+      when: add and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
     - name: Define IMS subcomponents
       command: 'jsub -f {{ uss_file_path }}/DFSE303J.j2'
@@ -42,7 +42,7 @@
       #   wait: "{{ zos_job_submit_wait }}"
       #   wait_time_s: "{{ zos_job_submit_wait_s }}"
       #   return_output: "{{ zos_job_submit_return_output }}"
-      when: copy and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+      when: copy and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
     - name: Copy procs to jobs dataset
       command: 'jsub -f {{ uss_file_path }}/DFSE313J.j2'
@@ -53,7 +53,7 @@
       #   wait: "{{ zos_job_submit_wait }}"
       #   wait_time_s: "{{ zos_job_submit_wait_s }}"
       #   return_output: "{{ zos_job_submit_return_output }}"
-      when: copy_to_jobs and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+      when: copy_to_jobs and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
     - name: Copy staging libs
       command: 'jsub -f {{ uss_file_path }}/DFSCPYST.j2'
@@ -64,7 +64,7 @@
       #   wait: "{{ zos_job_submit_wait }}"
       #   wait_time_s: "{{ zos_job_submit_wait_s }}"
       #   return_output: "{{ zos_job_submit_return_output }}"
-      when: copy_stage_libs and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+      when: copy_stage_libs and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
 
     - name: Create additional sample procedures

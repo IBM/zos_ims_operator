@@ -90,26 +90,29 @@
       when: rm_status.ims_output[0].type_2_response[0].Status == 'ABENDED'
 
 
-    - name: Query IMS Connect
-      ims_command:
-        command: QUERY IMSCON TYPE(CONFIG) SHOW(ALL)
-        plex: '{{ DFS_IMSPlex }}'
-      register: imscon_status
-      #ignore_errors: true
+    # - name: Query IMS Connect
+    #   ims_command:
+    #     command: QUERY IMSCON TYPE(CONFIG) SHOW(ALL)
+    #     plex: '{{ DFS_IMSPlex }}'
+    #   register: imscon_status
+    #   #ignore_errors: true
 
-    - debug:
-        msg: '{{ imscon_status.ims_output[0] }}'
+    # - debug:
+    #     msg: '{{ imscon_status.ims_output[0] }}'
 
-    - block:
+    # - block:
 
-      - name: ICON start
-        command: 'jsub {{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.JOBS({{ DFS_IMS_SSID }}HWS1)'
-        # zos_job_submit: 
-        #   max_rc: 16
-        #   src: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.JOBS({{ DFS_IMS_SSID }}HWS1)"
-        #   location: DATA_SET
-        #   wait: "{{ zos_job_submit_wait }}"
-        #   wait_time_s: "{{ zos_job_submit_wait_s }}"
-        #   return_output: "{{ zos_job_submit_return_output }}"
+    #   - name: ICON start
+    #     command: 'jsub {{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.JOBS({{ DFS_IMS_SSID }}HWS1)'
+    #     # zos_job_submit: 
+    #     #   max_rc: 16
+    #     #   src: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.JOBS({{ DFS_IMS_SSID }}HWS1)"
+    #     #   location: DATA_SET
+    #     #   wait: "{{ zos_job_submit_wait }}"
+    #     #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+    #     #   return_output: "{{ zos_job_submit_return_output }}"
 
-      when: imscon_status.failed
+    #   when: imscon_status.failed
+
+    - name: Provisioning Complete!
+      meta: noop 

@@ -1,18 +1,18 @@
 ---
 #
-# Copyright 2023 IBM Inc. All Rights Reserved.
+# Copyright 2023 IBM Inc. All Rights Reserved
 # SPDX-License-Identifier: Apache-2.0
 #
 - name: Test Playbook
   hosts: all
   gather_facts: false
   # * Include different variable files depending on environment/inventory used
-  vars_files:
-    - vars_wazi/ims-dbdc.yml
-    - vars_wazi/ims-zos.yml
+  # vars_files:
+  #   - vars_wazi/ims-dbdc.yml
   environment: '{{ system_environment }}'
   vars:
     role_path: '/Users/adn/workspaces/nazare/operator-collections/ims/playbooks/roles/ims_dataset'
+    zCloud_CSSLIB: SYS1.CSSLIB2
 
   collections:
     - ibm.ibm_zos_core
@@ -21,18 +21,27 @@
   tasks:
   - block:
 
-      - name: Check if IMSPLEX PLXAD already Up
-        ims_command:
-          command: /DIS ACT
-          plex:  PLXWZ
-        register: qry_result
+    - name: '{{ zCloud_CSSLIB }} exists?'
+      zos_find:
+          patterns: '{{ zCloud_CSSLIB }}'
+      register: zos_find_output
+    - name: "{{ zCloud_CSSLIB }} doesn't exists?"
+      fail: 
+        msg: "{{ zCloud_CSSLIB }} doesn't exists"
+      when: zos_find_output.matched != 1 
 
-      - debug:
-          msg: '{{qry_result.msg}}'
-        # when: display_cmd_output.ims_output[0].msg != 'Success' 
-      - fail:
-          msg: 'fail'
-        when: qry_result.msg is defined and "Success" in qry_result.msg | join
+      # - name: Check if IMSPLEX PLXAD already Up
+      #   ims_command:
+      #     command: /DIS ACT
+      #     plex:  PLXWZ
+      #   register: qry_result
+
+      # - debug:
+      #     msg: '{{qry_result.msg}}'
+      #   # when: display_cmd_output.ims_output[0].msg != 'Success' 
+      # - fail:
+      #     msg: 'fail'
+      #   when: qry_result.msg is defined and "Success" in qry_result.msg | join
 
       # - name: Display all outstanding messages whose job name begin with {{DFS_IMS_SSID}}CTL
       #   zos_operator_action_query:
@@ -168,7 +177,7 @@
   #       managed_acbs:
   #         setup: true
   #   register: response
-  #   #ignore_errors: true
+  #   ignore_errors: true
 
   # - fail: 
   #     msg: '{{response.stderr}}'
@@ -241,7 +250,7 @@
     #   ibm.ibm_zos_core.zos_tso_command: 
     #     commands: 
     #           - LU andy
-    #   # #ignore_errors: true
+    #   # ignore_errors: true
     #   register: lu_result
     #   failed_when: lu_result.output[0].rc > 4
 
@@ -249,7 +258,7 @@
     #   ibm.ibm_zos_core.zos_tso_command: 
     #     commands: 
     #           - RACDCERT ID(IMSUSER) LISTRING(IMSTLSRING2)
-    #   # #ignore_errors: true
+    #   # ignore_errors: true
     #   register: lu_result
     #   failed_when: lu_result.output[0].rc > 4
 

@@ -21,7 +21,7 @@
       #   wait: "{{ zos_job_submit_wait }}"
       #   wait_time_s: "{{ zos_job_submit_wait_s }}"
       #   return_output: "{{ zos_job_submit_return_output }}"
-      when: enable_olc and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+      when: enable_olc and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
 
     # We need a module for the online change utility, no way around it
@@ -34,4 +34,4 @@
       #   wait: "{{ zos_job_submit_wait }}"
       #   wait_time_s: "{{ zos_job_submit_wait_s }}"
       #   return_output: "{{ zos_job_submit_return_output }}"
-      when: active_libs and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+      when: active_libs and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )

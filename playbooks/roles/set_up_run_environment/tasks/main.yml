@@ -1,6 +1,6 @@
 ---
 #
-# Copyright 2023 IBM Inc. All Rights Reserved.
+# Copyright 2023 IBM Inc. All Rights Reserved
 # SPDX-License-Identifier: Apache-2.0
 #
 - name: Retrieve k8s context
@@ -36,12 +36,39 @@
       ODBM_SSLPORTID: "{{ tmdb_cr_instance.resources[0].spec.ODBM_SSLPORTID }}"
       IMS_CONNECT_PORT: "{{ tmdb_cr_instance.resources[0].spec.IMS_CONNECT_PORT }}"
       IMS_CONNECT_SSLPORT: "{{ tmdb_cr_instance.resources[0].spec.IMS_CONNECT_SSLPORT }}"
+      DFS_AUTH_LIB_SYSHLQ1: "{{ tmdb_cr_instance.resources[0].spec.Optional_IMS_Configuration.DFS_AUTH_LIB_SYSHLQ1 }}"
+      DFS_AUTH_LIB_HLQ1: "{{ tmdb_cr_instance.resources[0].spec.Optional_IMS_Configuration.DFS_AUTH_LIB_HLQ1 }}"
+      DFS_SMS_ENVIRONMENT: "{{ tmdb_cr_instance.resources[0].spec.Optional_IMS_Configuration.DFS_SMS_ENVIRONMENT }}"
+      DFS_SMS_CLASS: "{{ tmdb_cr_instance.resources[0].spec.Optional_IMS_Configuration.DFS_SMS_CLASS }}"
+      STEPLIB: "{{ tmdb_cr_instance.resources[0].spec.Optional_IMS_Configuration.STEPLIB }}"
+      JOB_CLASS: "{{ tmdb_cr_instance.resources[0].spec.Optional_zOS_Configuration.JOB_CLASS }}"
+      MSG_CLASS: "{{ tmdb_cr_instance.resources[0].spec.Optional_zOS_Configuration.MSG_CLASS }}"
+      zCloud_PROCLIB: "{{ tmdb_cr_instance.resources[0].spec.Optional_zOS_Configuration.zCloud_PROCLIB }}"
+      zCloud_LERuntime: "{{ tmdb_cr_instance.resources[0].spec.Optional_zOS_Configuration.zCloud_LERuntime }}"
+      zCloud_MACLIB: "{{ tmdb_cr_instance.resources[0].spec.Optional_zOS_Configuration.zCloud_MACLIB }}"
+      zCloud_CSSLIB: "{{ tmdb_cr_instance.resources[0].spec.Optional_zOS_Configuration.zCloud_CSSLIB }}"
       instance_creationTime: "{{ tmdb_cr_instance.resources[0].metadata.creationTimestamp[0:15]}}"
       instance_lastTransitionTime: "{{ tmdb_cr_instance.resources[0].status.conditions[0].lastTransitionTime[0:15]}}"
       reconcile_run: false
       ims_is_up: false
       active_hws_jobid: ""
   
+
+  - name: set optional volume
+    set_fact:
+      DFS_DS_VOLUME1: "{{ tmdb_cr_instance.resources[0].spec.Optional_IMS_Configuration.DFS_DS_VOLUME1 }}"
+    when: tmdb_cr_instance.resources[0].spec.Optional_IMS_Configuration.DFS_DS_VOLUME1 is defined
+
+  - name: set optional DFS_AUTH_LIB_SYSHLQ2
+    set_fact:
+      DFS_AUTH_LIB_SYSHLQ2: "{{ tmdb_cr_instance.resources[0].spec.Optional_IMS_Configuration.DFS_AUTH_LIB_SYSHLQ2 }}"
+    when: tmdb_cr_instance.resources[0].spec.Optional_IMS_Configuration.DFS_AUTH_LIB_SYSHLQ2 is defined
+      
+  - name: set optional DFS_AUTH_LIB_HLQ2
+    set_fact:    
+      DFS_AUTH_LIB_HLQ2: "{{ tmdb_cr_instance.resources[0].spec.Optional_IMS_Configuration.DFS_AUTH_LIB_HLQ2 }}"
+    when: tmdb_cr_instance.resources[0].spec.Optional_IMS_Configuration.DFS_AUTH_LIB_HLQ2 is defined
+
   - debug:
       msg: 
         - '{{instance_creationTime}}'
@@ -66,6 +93,30 @@
         - '{{IMS_CONNECT_SSLPORT}}'
         - '{{reconcile_run}}'
         - '{{ims_is_up}}'
+        - '{{DFS_AUTH_LIB_SYSHLQ1}}'
+        - "{{ tmdb_cr_instance.resources[0].spec.Optional_IMS_Configuration.DFS_AUTH_LIB_SYSHLQ1 }}"
+        - '{{DFS_AUTH_LIB_SYSHLQ2}}'
+        - '{{DFS_AUTH_LIB_HLQ1}}'
+        - "{{ tmdb_cr_instance.resources[0].spec.Optional_IMS_Configuration.DFS_AUTH_LIB_HLQ1 }}"
+        - '{{DFS_AUTH_LIB_HLQ2}}'
+        - '{{DFS_SMS_ENVIRONMENT}}'
+        - "{{ tmdb_cr_instance.resources[0].spec.Optional_IMS_Configuration.DFS_SMS_ENVIRONMENT }}"
+        - '{{DFS_SMS_CLASS}}'
+        - "{{ tmdb_cr_instance.resources[0].spec.Optional_IMS_Configuration.DFS_SMS_CLASS }}"
+        - '{{STEPLIB}}'
+        - "{{ tmdb_cr_instance.resources[0].spec.Optional_IMS_Configuration.STEPLIB }}"
+        - '{{JOB_CLASS}}'
+        - "{{ tmdb_cr_instance.resources[0].spec.Optional_zOS_Configuration.JOB_CLASS }}"
+        - '{{MSG_CLASS}}'
+        - "{{ tmdb_cr_instance.resources[0].spec.Optional_zOS_Configuration.MSG_CLASS }}"
+        - '{{zCloud_PROCLIB}}'
+        - "{{ tmdb_cr_instance.resources[0].spec.Optional_zOS_Configuration.zCloud_PROCLIB }}"
+        - '{{zCloud_LERuntime}}'
+        - "{{ tmdb_cr_instance.resources[0].spec.Optional_zOS_Configuration.zCloud_LERuntime }}"
+        - '{{zCloud_MACLIB}}'
+        - "{{ tmdb_cr_instance.resources[0].spec.Optional_zOS_Configuration.zCloud_MACLIB }}"
+        - '{{zCloud_CSSLIB}}'
+        - "{{ tmdb_cr_instance.resources[0].spec.Optional_zOS_Configuration.zCloud_CSSLIB }}"
 
   - name: This run is due to reconcile
     set_fact:
@@ -98,13 +149,17 @@
     TCPIP_PROFILE_TMP: '{{ DFS_AUTH_LIB_HLQ1 }}.TEMP'
     ROUTE: '{{ DFS_IMS_SSID }}'
     ZOS_RELEASE: '{{proclib_ds.stdout[5:9]}}'
-    DFS_DS_VOLUME1: '{{proclib_ds.stdout[8]}}{{proclib_ds.stdout[7]}}USR1'
+    #DFS_DS_VOLUME1: '{{proclib_ds.stdout[8]}}{{proclib_ds.stdout[7]}}USR1'
     DFS_DS_VOLUME2: '{{proclib_ds.stdout[8]}}{{proclib_ds.stdout[7]}}USR1'
 
 - debug:
     var: 
       - ZOS_RELEASE
       - DFS_DS_VOLUME1
+
+- set_fact: 
+    DFS_DS_VOLUME1: '{{proclib_ds.stdout[8]}}{{proclib_ds.stdout[7]}}USR1'
+  when: tmdb_cr_instance.resources[0].spec.Optional_IMS_Configuration.DFS_DS_VOLUME1 is not defined
 
 - set_fact:
     system_environment: '{{ system_environment | combine(new_item, recursive=true) }}'

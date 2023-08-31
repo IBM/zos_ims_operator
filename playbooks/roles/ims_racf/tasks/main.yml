@@ -26,4 +26,4 @@
         #     from: ISO8859-1
         #     to: IBM-1047
         # when: prep_racf
-        when: prep_racf and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+        when: prep_racf and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )

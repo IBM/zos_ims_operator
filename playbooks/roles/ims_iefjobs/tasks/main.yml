@@ -28,4 +28,4 @@
         rexx_name: 'IEFJOBS.j2'
         max_rc: 0
 
-      when: iefjobs == "create" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+      when: iefjobs == "create" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )

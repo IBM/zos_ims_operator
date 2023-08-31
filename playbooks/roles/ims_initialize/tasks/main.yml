@@ -50,7 +50,7 @@
             done
           args:
             chdir: '{{ proclib_tmp_dir.path }}'
-          when: ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+          when: ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
       always:
         - name: Delete the temporary PROCLIB files directory
           file:

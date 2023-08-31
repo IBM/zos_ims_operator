@@ -18,80 +18,25 @@
     - operator_sdk.util
 
   tasks:
-    
-    # check if licence has been accepted and fail if not.
-    - name: check for license agreement and fail if not accepted
-      ansible.builtin.fail:
-        msg: Product license was not accepted
-      when: not accept
-
-    - include_role:
-        name: set_up_run_environment
-
-    # This block is for handling 'Create' event
-    - block:  
-        # - name: send all templates to host
-        #   include_role:
-        #     name: send_all_templates
-
-        - name: Provisioning starting.... this is a new instance
-          include_role:
-            name: update_instance_status
-          vars:
-            status_key: 'run_result'
-            status_val: 'Provisioning in progress...'
-            instance_kind: TMDB
-          when: tmdb_cr_instance.resources[0].status.run_result is not defined
-
-        - name: Saving templates location.... this is a new instance
-          include_role:
-            name: update_instance_status
-          vars:
-            status_key: 'templates_path'
-            status_val: '{{tmdb_tmp_dir}}'
-            instance_kind: TMDB
-
-      when: not reconcile_run
-
-    # This block is for handling faildDup reconcile event
-    - block:  
-        - name: Delete the temporary provision files directory {{ tmdb_tmp_dir.path }}
-          file:
-            path: "{{ tmdb_tmp_dir.path }}"
-            state: absent
-
-        # - name: send all templates to host
-        #   include_role:
-        #     name: send_all_templates
-
-        - name: Provisioning starting.... this is reconciling a failedDup instance
-          include_role:
-            name: update_instance_status
-          vars:
-            status_key: 'run_result'
-            status_val: 'Provisioning in progress...'
-            instance_kind: TMDB
-          when: tmdb_cr_instance.resources[0].status.run_result is not defined
-
-        - name: Saving templates location....
-          include_role:
-            name: update_instance_status
-          vars:
-            status_key: 'templates_path'
-            status_val: '{{tmdb_tmp_dir}}'
-            instance_kind: TMDB
-
-      when: 
-       - reconcile_run
-       - tmdb_cr_instance.resources[0].status.run_result == 'failedDup'
-
-    - name: Validate user inputs
-      include_role: 
-        name: check_inputs
-      vars:
-        fail_task: true
-
     - block:
+
+      # check if licence has been accepted and fail if not.
+      - name: License not accepted
+        ansible.builtin.fail:
+          msg: Product license was not accepted
+        when: not accept
+
+      - name: Set up Run environment
+        include_role:
+          name: set_up_run_environment
+
+      - name: Validate user inputs
+        include_role: 
+          name: check_inputs
+        vars:
+          fail_task: true
+
+      # - block:
       - name: Check if IMS already up
         include_role: 
           name: check_duplicate_ims
@@ -105,26 +50,72 @@
           name: check_port
         vars:
           in_reconcile_mode: '{{reconcile_run}}'
-        when: not reconcile_run or ( reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup')
+        when: not reconcile_run or ( reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation')
 
-      - name: send all templates to host
-        include_role:
-          name: send_all_templates
-        when: not reconcile_run or ( reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup')
+      # This block is for handling 'Create' event
+      - block:  
 
+          - name: Provisioning starting.... this is a new instance
+            include_role:
+              name: update_instance_status
+            vars:
+              status_key: 'run_result'
+              status_val: 'Provisioning in progress...'
+              instance_kind: TMDB
+            # when: tmdb_cr_instance.resources[0].status.run_result is not defined
+
+          - name: send all templates to host
+            include_role:
+              name: send_all_templates
+
+          - name: Saving templates location.... this is a new instance
+            include_role:
+              name: update_instance_status
+            vars:
+              status_key: 'templates_path'
+              status_val: '{{tmdb_tmp_dir}}'
+              instance_kind: TMDB
+
+        when: not reconcile_run
+
+      # This block is for handling faildDup reconcile event
+      - block:  
+          - name: Delete the temporary provision files directory {{ tmdb_tmp_dir.path }}
+            file:
+              path: "{{ tmdb_tmp_dir.path }}"
+              state: absent
+
+          - name: Provisioning starting.... this is reconciling a failedInputValidation instance
+            include_role:
+              name: update_instance_status
+            vars:
+              status_key: 'run_result'
+              status_val: 'Provisioning in progress...'
+              instance_kind: TMDB
+            # when: tmdb_cr_instance.resources[0].status.run_result is not defined
+
+          - name: send all templates to host
+            include_role:
+              name: send_all_templates
+
+          - name: Saving templates location....
+            include_role:
+              name: update_instance_status
+            vars:
+              status_key: 'templates_path'
+              status_val: '{{tmdb_tmp_dir}}'
+              instance_kind: TMDB
+
+        when: 
+        - reconcile_run
+        - tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation'
+
+      
       - include_role:
           name: provision_ims
 
       - include_role:
           name: monitor_ims
-
-      - name: Update CR instance run status
-        include_role:
-          name: update_instance_status
-        vars:
-          status_val: 'provisioning done...'
-          status_key: 'run_result'
-          instance_kind: TMDB
 
       always:
         - block:
@@ -140,5 +131,6 @@
               msg: 'temp dir to delete: {{tmdb_tmp_dir.path}}'
       vars:
         uss_file_path: '{{ tmdb_tmp_dir.path }}'
+
   handlers:
     - include: handlers/handlers.yml

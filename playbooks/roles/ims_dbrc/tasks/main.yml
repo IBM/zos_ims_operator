@@ -31,7 +31,7 @@
       #   vars:
       #     path: '{{ eager_role_path }}/templates/DFSE314J.j2'
 
-      # when: prep_dbrc and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+      # when: prep_dbrc and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
       # - name: Initialize RECON data sets
       #   ims_dbrc:

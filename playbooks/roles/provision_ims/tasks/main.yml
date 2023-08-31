@@ -200,3 +200,10 @@
         function: 'add'
       when: ODBM_SSLPORTID
 
+    - name: Update CR instance run status
+      include_role:
+        name: update_instance_status
+      vars:
+        status_key: 'run_result'
+        status_val: 'Provisioning completed'
+        instance_kind: TMDB

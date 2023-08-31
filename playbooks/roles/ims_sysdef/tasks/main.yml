@@ -23,7 +23,7 @@
           #   wait_time_s: "{{ zos_job_submit_wait_s }}"
           #   return_output: "{{ zos_job_submit_return_output }}"
           # when: preprocess
-          when: preprocess and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+          when: preprocess and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
       - block:
 
@@ -37,7 +37,7 @@
           #   wait_time_s: "{{ zos_job_submit_wait_s }}"
           #   return_output: "{{ zos_job_submit_return_output }}"
           # when: stage1
-          when: stage1 and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+          when: stage1 and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
 
       - block:
@@ -52,4 +52,4 @@
           #   wait_time_s: "{{ zos_job_submit_wait_s }}"
           #   return_output: "{{ zos_job_submit_return_output }}"
           # when: stage2
-          when: stage2 and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+          when: stage2 and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )

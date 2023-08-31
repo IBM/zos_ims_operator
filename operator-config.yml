@@ -98,7 +98,7 @@ resources:
         type: string
         default: '/u/ibmuser'
 
-      - name: Optional IMS Configuration 
+      - name: Optional_IMS_Configuration 
         displayName: Optional IMS Configuration 
         description: More advanced IMS configuation options 
         type: object
@@ -151,7 +151,7 @@ resources:
             default: DFSF10.SDFSRESL
             required: false
 
-      - name: Optional z/OS Configuration
+      - name: Optional_zOS_Configuration
         displayName: Optional z/OS Configuration 
         description: More advanced z/OS configuation options 
         type: object

@@ -46,7 +46,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: cqs == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+      when: cqs == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
     - name: Copy input to member CQSSL000
       zos_mvs_raw:
@@ -66,7 +66,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: cqs == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+      when: cqs == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
     - name: Copy input to member CQSSG000
       zos_mvs_raw:
@@ -86,7 +86,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: cqs == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+      when: cqs == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
     - name: Copy input to member DFSSQ000
       zos_mvs_raw:
@@ -106,7 +106,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: cqs == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
+      when: cqs == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
     # Query CQS status
     - name: Query CQS status

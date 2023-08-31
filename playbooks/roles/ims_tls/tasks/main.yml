@@ -72,7 +72,7 @@
           - SETROPTS RACLIST(FACILITY DIGTCERT DIGTRING) REFRESH
       #ignore_errors: true
 
-    - name: Update pagttls 
+    - name: Add {{port_number}} to {{ TCPIP_PROFILE_TLS }}
       shell: | 
               dmod -b -d -c IBM-1047 -f -m  "Begin Ansible Block Insert \n End Ansible Block Insert\n## {mark} TLS for {{port_number}} ##" "$ a\\##\n## TCP/IP Policy Agent AT-TLS configuration for IMS.\n##\n##-----------------------------\nTTLSRule zOS_IMS_{{port_number}}\n{\n    LocalPortRange {{port_number}}\n    Direction Inbound\n    TTLSGroupActionRef grp_Production\n    TTLSEnvironmentActionRef act_zOS_IMS\n}\nTTLSEnvironmentAction  act_zOS_IMS\n{\n    HandshakeRole Server\n    TTLSKeyRingParms\n        {\n        Keyring IMSTLSRING\n        }\n    TTLSEnvironmentAdvancedParms\n        {\n        TLSv1.2                         On\n        SSLV3 Off\n        }\n}\nTTLSGroupAction grp_Production\n{\n    TTLSEnabled On\n    Trace 2\n}" "ADCD.{{zos_level}}.TCPPARMS(TLSPOLY1)"
       # ibm.ibm_zos_core.zos_blockinfile:
@@ -119,7 +119,7 @@
   when: function == 'add'
 
 - block:
-    - name: Update pagttls 
+    - name: Remove {{port_number}} from {{ TCPIP_PROFILE_TLS }} 
       shell: |
               dmod -b -f -m "Begin Ansible Block Insert \n End Ansible Block Insert\n## {mark} TLS for {{port_number}} ##" "//d" "ADCD.{{zos_level}}.TCPPARMS(TLSPOLY1)"
       # ibm.ibm_zos_core.zos_blockinfile:
@@ -128,7 +128,7 @@
       #         marker: "## {mark} TLS for {{ port_number}} ##"
       #         marker_begin: " Begin Ansible Block Insert "
       #         marker_end: " End Ansible Block Insert"
-      #ignore_errors: true
+      ignore_errors: true
 
     - name: Refresh PAGENT 
       ibm.ibm_zos_core.zos_operator:
