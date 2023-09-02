@@ -21,14 +21,72 @@
   tasks:
   - block:
 
-    - name: '{{ zCloud_CSSLIB }} exists?'
-      zos_find:
-          patterns: '{{ zCloud_CSSLIB }}'
-      register: zos_find_output
-    - name: "{{ zCloud_CSSLIB }} doesn't exists?"
-      fail: 
-        msg: "{{ zCloud_CSSLIB }} doesn't exists"
-      when: zos_find_output.matched != 1 
+      - name: clean up files that zoau leaves behind
+        shell: rm /tmp/{{item}}*
+        with_sequence: 0-9
+        register: output
+        failed_when: output.rc | int > 1
+      
+
+      # - name: Find joblog for {{DFS_IMS_SSID}}CTL
+      #   zos_job_output:
+      #     job_name: '{{ DFS_IMS_SSID }}CTL'
+      #     ddname: "JESMSGLG"
+      #   register: dd_output
+
+      # - name: Get active {{DFS_IMS_SSID}}CTL joblog
+      #   set_fact: 
+      #     active_ctl_msg: '{{item.ddnames[0].content}}'
+      #   when: 
+      #       - item.system != None 
+      #       - item.ret_code.msg_text is defined
+      #       - item.ret_code.msg_text == "AC"
+      #   with_items: '{{dd_output.jobs}}'
+
+      # - debug:
+      #     var: active_ctl_msg
+      
+      # - name: Issue IMS /ERE
+      #   ims_command:
+      #     command:  "ERE."
+      #     plex:  '{{ DFS_IMSPlex }}'
+      #     route: '{{ DFS_IMS_SSID }}'
+      #   when: 
+      #     - active_ctl_msg is defined 
+      #     - '"DUPLICATE ENTRY ON SIGNON REQUEST" in active_ctl_msg | join'
+
+      # - name: Issue /DIS ACT command
+      #   ims_command:
+      #     command: /DIS ACT
+      #     plex:  '{{ DFS_IMSPlex }}'
+      #     route: '{{ DFS_IMS_SSID }}'
+      #   register: display_result
+      #   ignore_errors: true
+
+      # - name: IMS cold start
+      #   ims_command:
+      #     command:  NRE CHECKPOINT 0 FMT ALL
+      #     plex:  '{{ DFS_IMSPlex }}'
+      #     route: '{{ DFS_IMS_SSID }}'
+      #   when: 
+      #     - display_result.msg is defined 
+      #     - '"Success" not in display_result.msg | join'
+
+      # - name: Issue /DIS ACT command
+      #   ims_command:
+      #     command: /DIS ACT
+      #     plex:  '{{ DFS_IMSPlex }}'
+      #     route: '{{ DFS_IMS_SSID }}'
+      #   register: display_result
+
+    # - name: '{{ zCloud_CSSLIB }} exists?'
+    #   zos_find:
+    #       patterns: '{{ zCloud_CSSLIB }}'
+    #   register: zos_find_output
+    # - name: "{{ zCloud_CSSLIB }} doesn't exists?"
+    #   fail: 
+    #     msg: "{{ zCloud_CSSLIB }} doesn't exists"
+    #   when: zos_find_output.matched != 1 
 
       # - name: Check if IMSPLEX PLXAD already Up
       #   ims_command:

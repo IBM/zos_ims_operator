@@ -45,18 +45,21 @@
           active_ctl_msg: '{{item.ddnames[0].content}}'
         when: 
             - item.system != None 
-            - item.asid is defined
-            - item.asid != "0"
+            - item.ret_code.msg_text is defined
+            - item.ret_code.msg_text == "AC"
         with_items: '{{dd_output.jobs}}'
 
-      - name: Issue IMS /ERE OVERRIDE.
-        ims_command:
-          command:  "ERE OVERRIDE."
-          plex:  '{{ DFS_IMSPlex }}'
-          route: '{{ DFS_IMS_SSID }}'
-        when:
-          - active_ctl_msg is defined 
-          - '"DUPLICATE ENTRY ON SIGNON REQUEST" in active_ctl_msg | join'
+      # - name: Issue IMS /ERE OVERRIDE.
+      #   ims_command:
+      #     command:  "ERE OVERRIDE."
+      #     plex:  '{{ DFS_IMSPlex }}'
+      #     route: '{{ DFS_IMS_SSID }}'
+      #   when:
+      #     - active_ctl_msg is defined 
+      #     - '"DUPLICATE ENTRY ON SIGNON REQUEST" in active_ctl_msg | join'
+
+      - debug:
+          var: active_ctl_msg
 
       - name: Issue IMS /ERE
         ims_command:
@@ -65,7 +68,7 @@
           route: '{{ DFS_IMS_SSID }}'
         when: 
           - active_ctl_msg is defined 
-          - '"DUPLICATE ENTRY ON SIGNON REQUEST" in active_ctl_msg | join'
+          - '"A COLD START OR EMERGENCY RESTART IS REQUIRED" in active_ctl_msg | join'
 
       - name: Issue /DIS ACT command
         ims_command:

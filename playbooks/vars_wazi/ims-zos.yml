@@ -20,6 +20,9 @@ zCloud_MACLIB: SYS1.MACLIB
 # Dataset containing zos CSS library
 zCloud_CSSLIB: SYS1.CSSLIB
 
+zCloud_PROCLIB: SYS1.PROCLIB
+zCloud_MODGEN: SYS1.MODGEN
+
 # ---------------------------------------------------------------------------- #
 #                            TCP/TLS configuration                             #
 # ---------------------------------------------------------------------------- #

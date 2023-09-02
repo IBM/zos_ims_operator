@@ -57,6 +57,12 @@ DFS_AUTH_LIB_SYSHLQ:
 ZOS_RELEASE: ''
 
 STEPLIB: '{{DFS_AUTH_LIB_SYSHLQ1}}.SDFSRESL'
+
+DFS_INIT_JAVA_CONF: false
+
+# Optimizes runtime if user is provisioning IMS
+reconcile_run: false
+
 # ---------------------------------------------------------------------------- #
 
 # ---------------------------------------------------------------------------- #
@@ -100,13 +106,6 @@ REGION_NUM: 1
 # Working directory for the IMS Java region (JMP)
 DFS_workingdir: /u/{{ TARGET_USERNAME }}
 
-# ---------------------------------------------------------------------------- #
-#                             IMS Discovery Settings                           #
-# ---------------------------------------------------------------------------- #
-HOSTNAME:
-
-DFS_INIT_JAVA_CONF: false
-
 DFS_IMS_UNIT: SYSALLDA
 DFS_IMS_UNIT2: 3390
 ODBM_PORTIDSuf: 99
@@ -129,12 +128,7 @@ DFS_useRRS: 'N'
 # EZB_TCPIP_LoadLib: SYS1.TCPIP.LINKLIB
 # GIM_IMS_TARGETzone: IMSTZ13
 # GIM_IMS_GLOBALzone_CSI: IMSCLOUD
-
 # zCloud_LPALIB: SYS1.LPALIB
-
-zCloud_PROCLIB: SYS1.PROCLIB
-zCloud_MODGEN: SYS1.MODGEN
-
 # zCloud_VTAM_VTAMLIST: SYS3.VTAMLST
 # zCloud_VTAM_VTAMLIB: SYS3.VTAMLIB
 # zCloud_VTAM_VOL: IMSCLS
@@ -151,8 +145,6 @@ DFS_IXUSTIM1: 300
 DXR_IRLM_SSID: XRLM
 DXR_IRLM_Procedure: IRLM23D
 
-# cobolcomp: DSNAME
-
 CSQ_SSID: CSQ1
 
 ## SVC Values
@@ -160,5 +152,4 @@ zCloud_IMS_SVC_Type2: '203'  #'229'
 zCloud_IMS_SVC_Type4: '202'  #'249'
 
 
-# Optimizes runtime if user is provisioning IMS
-reconcile_run: false
+

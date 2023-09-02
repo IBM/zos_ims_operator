@@ -117,20 +117,33 @@
       - include_role:
           name: monitor_ims
 
+      - name: Update CR instance run status
+        include_role:
+          name: update_instance_status
+        vars:
+          status_key: 'run_result'
+          status_val: 'Provisioning completed'
+          instance_kind: TMDB
+
+      - name: Provisioning Complete!
+        meta: noop 
+
       always:
-        - block:
-          - debug:
-              var: ansible_failed_task
-          when: ansible_failed_task is defined
-        - block:
-          - debug:
-              var: ansible_failed_result
-          when: ansible_failed_result is defined
-        - block:
-          - debug:  
-              msg: 'temp dir to delete: {{tmdb_tmp_dir.path}}'
+        # - block:
+        #   - debug:
+        #       var: ansible_failed_task
+        #   when: ansible_failed_task is defined
+        # - block:
+        #   - debug:
+        #       var: ansible_failed_result
+        #   when: ansible_failed_result is defined
+        - name: clean up files that zoau leaves behind
+          shell: rm /tmp/{{item}}*
+          with_sequence: 0-9
+          register: output
+          failed_when: output.rc | int > 1
       vars:
         uss_file_path: '{{ tmdb_tmp_dir.path }}'
 
-  handlers:
-    - include: handlers/handlers.yml
+  # handlers:
+  #   - include: handlers/handlers.yml

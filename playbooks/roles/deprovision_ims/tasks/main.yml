@@ -34,7 +34,7 @@
           - command: STOP DB ALL
             plex: '{{ DFS_IMSPlex }}'
             route: '{{ DFS_IMS_SSID }}'
-       # ignore_errors: true
+      ignore_errors: true
       when: not ims_not_up
 
     - name: Immediate IMS Shutdown
@@ -42,7 +42,7 @@
         command: CHE FREEZE
         plex: '{{ DFS_IMSPlex }}'
         route: '{{ DFS_IMS_SSID }}'
-      # ignore_errors: true
+      ignore_errors: true
       when: not ims_not_up
 
     # Stop ICON
@@ -98,11 +98,11 @@
         vars:
           catalog: delete
 
-    - block:
-      - include_role:
-          name: ims_iefjobs
-        vars:
-          iefjobs: delete
+    # - block:
+    #   - include_role:
+    #       name: ims_iefjobs
+    #     vars:
+    #       iefjobs: delete
 
     - block:
       - include_role:
@@ -128,14 +128,3 @@
           zos_level: '{{ZOS_RELEASE}}'
           function: 'remove'
         when: ODBM_SSLPORTID
-
-    - name: Update CR instance run status
-      include_role:
-        name: update_instance_status
-      vars:
-        status_key: 'run_result'
-        status_val: 'Deprovision completed'
-        instance_kind: TMDB
-    
-    - name: Deprovisioning Complete!
-      meta: noop
