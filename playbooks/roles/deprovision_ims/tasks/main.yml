@@ -43,17 +43,23 @@
         plex: '{{ DFS_IMSPlex }}'
         route: '{{ DFS_IMS_SSID }}'
       ignore_errors: true
+      register: che_freeze_result
       when: not ims_not_up
+
+    - name: Cancel IMS control region because /che freeze didn't work
+      zos_operator:
+        cmd: 'c {{ DFS_IMS_SSID }}CTL'
+        verbose: true
+      when: 
+        - che_freeze_result.msg is defined 
+        - '"Success" not in che_freeze_result.msg | join'
 
     # Stop ICON
     - block:
       - include_role:
-          name: ims_common
+          name: ims_connect
         vars:
           icon: stop
-          ctl: ""
-          wait_for_job: false
-          cold_start: false
 
     # Stop ODBM
     - include_role:
@@ -98,11 +104,6 @@
         vars:
           catalog: delete
 
-    # - block:
-    #   - include_role:
-    #       name: ims_iefjobs
-    #     vars:
-    #       iefjobs: delete
 
     - block:
       - include_role:

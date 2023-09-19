@@ -1,0 +1,44 @@
+---
+#
+# Copyright 2023 IBM Inc. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Open Database Manager (ODBM)
+- name: Open Database Manager
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+  vars:
+        odbm_not_up: false
+        
+  block:
+
+    # Add a role or function to modify JOB_CARD in DFSODBM.j2
+
+    - name: Check if {{ DFS_IMS_SSID }}ODBM already Up
+      zos_operator:
+        cmd: 'd a,{{ DFS_IMS_SSID }}ODBM'
+      register: cmd_output
+    - set_fact:
+        odbm_not_up: true
+      when: cmd_output.content is defined and "NOT FOUND" in cmd_output.content | join
+
+    - name: Start Open Database Manager (ODBM)
+      command: 'jsub -f {{ uss_file_path }}/DFSODBM.j2'
+      # zos_job_submit: 
+      #   max_rc: 16
+      #   src: '{{ uss_file_path }}/DFSODBM.j2'
+      #   location: USS
+      #   wait: "{{ zos_job_submit_wait }}"
+      #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+      #   return_output: "{{ zos_job_submit_return_output }}"
+      when: 
+        - odbm == "start"
+        - odbm_not_up
+
+
+    - name: Stop Open Database Manager (ODBM)
+      zos_operator:
+        cmd: 'c {{ DFS_IMS_SSID }}ODBM'
+        verbose: true
+      when: odbm == "stop" and not odbm_not_up

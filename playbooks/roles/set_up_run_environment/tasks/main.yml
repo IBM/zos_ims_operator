@@ -149,7 +149,6 @@
     TCPIP_PROFILE_TMP: '{{ DFS_AUTH_LIB_HLQ1 }}.TEMP'
     ROUTE: '{{ DFS_IMS_SSID }}'
     ZOS_RELEASE: '{{proclib_ds.stdout[5:9]}}'
-    #DFS_DS_VOLUME1: '{{proclib_ds.stdout[8]}}{{proclib_ds.stdout[7]}}USR1'
     DFS_DS_VOLUME2: '{{proclib_ds.stdout[8]}}{{proclib_ds.stdout[7]}}USR1'
 
 - debug:
@@ -169,12 +168,14 @@
 
 - block:
 
-  - tempfile:
+  - name: Create temporary directory to store templates
+    tempfile:
       state: directory
     register: tmdb_tmp_dir
     when: tmdb_cr_instance.resources[0].status.templates_path is not defined
 
-  - set_fact:
+  - name: Overwrite template path with existing one for reconcile run
+    set_fact:
       tmdb_tmp_dir: '{{tmdb_cr_instance.resources[0].status.templates_path}}'
     when: tmdb_cr_instance.resources[0].status.templates_path is defined
 

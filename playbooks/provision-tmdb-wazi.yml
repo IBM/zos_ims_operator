@@ -62,7 +62,6 @@
               status_key: 'run_result'
               status_val: 'Provisioning in progress...'
               instance_kind: TMDB
-            # when: tmdb_cr_instance.resources[0].status.run_result is not defined
 
           - name: send all templates to host
             include_role:
@@ -129,14 +128,6 @@
         meta: noop 
 
       always:
-        # - block:
-        #   - debug:
-        #       var: ansible_failed_task
-        #   when: ansible_failed_task is defined
-        # - block:
-        #   - debug:
-        #       var: ansible_failed_result
-        #   when: ansible_failed_result is defined
         - name: clean up files that zoau leaves behind
           shell: rm /tmp/{{item}}*
           with_sequence: 0-9
@@ -144,6 +135,3 @@
           failed_when: output.rc | int > 1
       vars:
         uss_file_path: '{{ tmdb_tmp_dir.path }}'
-
-  # handlers:
-  #   - include: handlers/handlers.yml

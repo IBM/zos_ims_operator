@@ -1,0 +1,5 @@
+ARMRST=N,                /* SHOULD ARM RESTART OM ON FAILURE */
+IMSPLEX(NAME={{ DFS_IMSPlex }}),    /* IMSPLEX NAME (CSLPLEX1) */
+ODBMCFG=000,          /*suffix for CSLDCxxx  (CSLDC000)         */
+ODBMNAME={{ DFS_IMS_SSID[-1] }}ODB1,       /* ODBM NAME = ODBM1) */
+RRS=N           /* RRS=Y will use ODBA access                */

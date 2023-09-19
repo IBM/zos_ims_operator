@@ -25,7 +25,7 @@
     - set_fact:
         bpe_rm_config: '{{ role_path }}/templates/bpe_rm_config.txt'
         ri_config: '{{ role_path }}/templates/ri_config.txt'
-        rm_config: '{{ role_path }}/templates/rm_config.txt'
+        rm_proc: '{{ role_path }}/templates/rm_proc.txt'
 
     - name: Define BPECONFG
       zos_mvs_raw:
@@ -34,7 +34,7 @@
         dds:
           - dd_data_set:
               dd_name: sysut2
-              data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(BPECONFG)"
+              data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(BPECFRM)"
               disposition: shr
           - dd_dummy:
               dd_name: sysin
@@ -80,7 +80,7 @@
               dd_name: sysin
           - dd_input:
               dd_name: sysut1
-              content: "{{ lookup('template', '{{ rm_config }}') }}"
+              content: "{{ lookup('template', '{{ rm_proc }}') }}"
           - dd_output:
               dd_name: sysprint
               return_content:

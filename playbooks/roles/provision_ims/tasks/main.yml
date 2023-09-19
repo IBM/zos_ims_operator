@@ -97,6 +97,18 @@
       vars:
         rm: config
 
+    # Call ODBM config to copy & config ODBM
+    - include_role:
+        name: ims_odbm
+      vars:
+        odbm: config
+
+    # Call ICON config to copy & config ICON
+    - include_role:
+        name: ims_connect
+      vars:
+        icon: config
+
     # Call CQS to config
     - include_role:
         name: ims_common_queue
@@ -165,7 +177,6 @@
         ctl: start
         wait_for_job: true
         cold_start: true
-        icon: ""
 
     # Start ODBM
     - include_role:
@@ -175,12 +186,9 @@
 
     # Start ICONNECT
     - include_role:
-        name: ims_common
+        name: ims_connect
       vars:
         icon: start
-        ctl: ""
-        wait_for_job: false
-        cold_start: false
 
     # Configure TLS port for IMS ODBM
     - include_role:

@@ -11,6 +11,17 @@
 
   block:
 
+    # Query IMS-managed ACB status
+    - name: Query IMS-managed ACB status
+      ims_command:
+        command: QUERY MEMBER TYPE(IMS) SHOW(ATTRIB)
+        plex:  '{{ DFS_IMSPlex }}'
+      register: macb_status
+      #ignore_errors: true
+
+    - debug:
+        msg: '{{ macb_status }}'
+
     # Query OM status
     - name: Query OM status
       ims_command:

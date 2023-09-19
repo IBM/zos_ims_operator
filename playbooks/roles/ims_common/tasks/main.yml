@@ -70,6 +70,15 @@
           - active_ctl_msg is defined 
           - '"A COLD START OR EMERGENCY RESTART IS REQUIRED" in active_ctl_msg | join'
 
+      - name: Issue IMS /ERE OVERRIDE
+        ims_command:
+          command:  "ERE OVERRIDE."
+          plex:  '{{ DFS_IMSPlex }}'
+          route: '{{ DFS_IMS_SSID }}'
+        when: 
+          - active_ctl_msg is defined 
+          - '"EMERGENCY BACKUP OR OVERRIDE" in active_ctl_msg | join'
+
       - name: Issue /DIS ACT command
         ims_command:
           command: /DIS ACT
@@ -111,33 +120,3 @@
     - set_fact:
         icon_not_up: true
       when: cmd_output.content is defined and "NOT FOUND" in cmd_output.content | join
-
-    - name: ICON start
-      command: "jsub {{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.JOBS({{ DFS_IMS_SSID }}HWS1)"
-      # zos_job_submit: 
-      #   max_rc: 16
-      #   src: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.JOBS({{ DFS_IMS_SSID }}HWS1)"
-      #   location: DATA_SET
-      #   wait: "{{ zos_job_submit_wait }}"
-      #   wait_time_s: "{{ zos_job_submit_wait_s }}"
-      #   return_output: "{{ zos_job_submit_return_output }}"
-      when: 
-        - icon == "start"
-        - icon_not_up
-
-
-    # Start IMS Connect
-    # - name: Start ICON
-    #   zos_operator:
-    #     cmd: 's {{ DFS_IMS_SSID }}HWS1'
-    #     verbose: true
-    #   when: 
-    #     - icon == "start"
-    #     - icon_not_up
-
-    # Stop ICON
-    - name: Stop ICON
-      zos_operator:
-        cmd: 'c {{ DFS_IMS_SSID }}HWS'
-        verbose: true
-      when: icon == "stop" and not icon_not_up

@@ -7,12 +7,13 @@
   hosts: all
   gather_facts: false
   # * Include different variable files depending on environment/inventory used
-  # vars_files:
-  #   - vars_wazi/ims-dbdc.yml
+  vars_files:
+    - vars_wazi/ims-dbdc.yml
+    - vars_wazi/ims-zos.yml
   environment: '{{ system_environment }}'
   vars:
-    role_path: '/Users/adn/workspaces/nazare/operator-collections/ims/playbooks/roles/ims_dataset'
-    zCloud_CSSLIB: SYS1.CSSLIB2
+    # role_path: '/Users/adn/workspaces/nazare/operator-collections/ims/playbooks/roles/send_all_templates/'
+    # zCloud_CSSLIB: SYS1.CSSLIB2
 
   collections:
     - ibm.ibm_zos_core
@@ -21,12 +22,51 @@
   tasks:
   - block:
 
-      - name: clean up files that zoau leaves behind
-        shell: rm /tmp/{{item}}*
-        with_sequence: 0-9
-        register: output
-        failed_when: output.rc | int > 1
+      - name: Retrieve z/OS proclib dataset
+        raw: pproc
+        register: proclib_ds
+        
+      # - name: ims command
+      #   ims_command:
+      #     command:  "QUERY MEMBER TYPE(IMS) SHOW(ATTRIB)"
+      #     plex:  'PLXWZ'
+      #     route: 'IMWZ'
+
+
+
+      #############
+      #  test zos_job_submit:
+      #############5# 
       
+      # - set_fact:
+      #     eager_role_path: '{{role_path}}/ims_sysdef'
+
+      # - include_role:
+      #     name: send-template
+      #   vars:
+      #     path: '{{ eager_role_path }}/templates/DFS4STG2.j2'
+
+      # - name: submit job
+      #   # command: 'jsub -f {{ uss_file_path }}/DFSALCAT.j2'
+      #   zos_job_submit: 
+      #     max_rc: 16
+      #     src: '/tmp/ansible.67ny8vcy/DFSGNPRE.j2'
+      #     location: USS
+      #     # wait: "{{ zos_job_submit_wait }}"
+      #     wait_time_s: "{{ zos_job_submit_wait_s }}"
+          # return_output: "{{ zos_job_submit_return_output }}"
+        # when: catalog == "allocate" and (catalog_find_output.matched | int) == 0
+
+      # - name: clean up files that zoau leaves behind
+      #   shell: rm /tmp/{{item}}*
+      #   with_sequence: 0-9
+      #   register: output
+      #   failed_when: output.rc | int > 1
+      
+
+
+
+
 
       # - name: Find joblog for {{DFS_IMS_SSID}}CTL
       #   zos_job_output:

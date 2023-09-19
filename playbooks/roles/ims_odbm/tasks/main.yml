@@ -3,17 +3,15 @@
 # Copyright 2023 IBM Inc. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-# Open Database Manager (ODBM)
-- name: Open Database Manager
+# Tasks for Open Database (ODBM)
+- name: Resource Manager
   collections:
     - ibm.ibm_zos_core
     - ibm.ibm_zos_ims
   vars:
-        odbm_not_up: false
-        
-  block:
+      odbm_not_up: false
 
-    # Add a role or function to modify JOB_CARD in DFSODBM.j2
+  block:
 
     - name: Check if {{ DFS_IMS_SSID }}ODBM already Up
       zos_operator:
@@ -23,22 +21,112 @@
         odbm_not_up: true
       when: cmd_output.content is defined and "NOT FOUND" in cmd_output.content | join
 
-    - name: Start Open Database Manager (ODBM)
-      command: 'jsub -f {{ uss_file_path }}/DFSODBM.j2'
-      # zos_job_submit: 
-      #   max_rc: 16
-      #   src: '{{ uss_file_path }}/DFSODBM.j2'
-      #   location: USS
-      #   wait: "{{ zos_job_submit_wait }}"
-      #   wait_time_s: "{{ zos_job_submit_wait_s }}"
-      #   return_output: "{{ zos_job_submit_return_output }}"
+    # AL: Use mvs_raw to replace JCL
+    - set_fact:
+        bpe_odbm_config: '{{ role_path }}/templates/bpe_odbm_config.txt'
+        di_config: '{{ role_path }}/templates/di_config.txt'
+        dc_config: '{{ role_path }}/templates/dc_config.txt'
+        odbm_proc: '{{ role_path }}/templates/odbm_proc.txt'
+
+    - name: Define BPECONFG
+      zos_mvs_raw:
+        pgm: IEBGENER
+        auth: false
+        dds:
+          - dd_data_set:
+              dd_name: sysut2
+              data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(BPECFODB)"
+              disposition: shr
+          - dd_dummy:
+              dd_name: sysin
+          - dd_input:
+              dd_name: sysut1
+              content: "{{ lookup('template', '{{ bpe_odbm_config }}') }}"
+          - dd_output:
+              dd_name: sysprint
+              return_content:
+                type: text
+      when: odbm == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
+
+    - name: Add CSLDI000 member
+      zos_mvs_raw:
+        pgm: IEBGENER
+        auth: false
+        dds:
+          - dd_data_set:
+              dd_name: sysut2
+              data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(CSLDI000)"
+              disposition: shr
+          - dd_dummy:
+              dd_name: sysin
+          - dd_input:
+              dd_name: sysut1
+              content: "{{ lookup('template', '{{ di_config }}') }}"
+          - dd_output:
+              dd_name: sysprint
+              return_content:
+                type: text
+      when: odbm == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
+
+    - name: Add CSLDC000 member
+      zos_mvs_raw:
+        pgm: IEBGENER
+        auth: false
+        dds:
+          - dd_data_set:
+              dd_name: sysut2
+              data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(CSLDC000)"
+              disposition: shr
+          - dd_dummy:
+              dd_name: sysin
+          - dd_input:
+              dd_name: sysut1
+              content: "{{ lookup('template', '{{ dc_config }}') }}"
+          - dd_output:
+              dd_name: sysprint
+              return_content:
+                type: text
+      when: odbm == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
+
+    - name: Add ODBM member to PROCLIB
+      zos_mvs_raw:
+        pgm: IEBGENER
+        auth: false
+        dds:
+          - dd_data_set:
+              dd_name: sysut2
+              data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB({{ DFS_IMS_SSID }}ODBM)"
+              disposition: shr
+          - dd_dummy:
+              dd_name: sysin
+          - dd_input:
+              dd_name: sysut1
+              content: "{{ lookup('template', '{{ odbm_proc }}') }}"
+          - dd_output:
+              dd_name: sysprint
+              return_content:
+                type: text
+      when: odbm == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
+
+    # Start ODBM
+    - name: Start ODBM
+      zos_operator:
+        cmd: 's {{ DFS_IMS_SSID }}ODBM'
+        verbose: true
       when: 
         - odbm == "start"
         - odbm_not_up
 
-
-    - name: Stop Open Database Manager (ODBM)
+    # Stop ODBM
+    - name: Stop ODBM
       zos_operator:
         cmd: 'c {{ DFS_IMS_SSID }}ODBM'
         verbose: true
       when: odbm == "stop" and not odbm_not_up
+
+    # Query ODBM status
+    - name: Query ODBM status
+      ims_command:
+        command: QUERY IMSPLEX NAME(*) TYPE(ODBM) SHOW(STATUS)
+        plex:  '{{ DFS_IMSPlex }}'
+      when: odbm == "query"

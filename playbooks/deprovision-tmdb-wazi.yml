@@ -18,14 +18,32 @@
     - operator_sdk.util
 
   tasks:
+    - name: Retrieve the TMDB instance for {{ k8s_cr_event }} event
+      k8s_info:
+          api_version: '{{ k8s_cr_version }}'
+          kind: TMDB
+          name: '{{ ansible_operator_meta.name }}'
+          namespace: '{{ ansible_operator_meta.namespace }}'
+      register: tmdb_cr_instance
+      delegate_to: 127.0.0.1
+
+    - debug:
+        var: tmdb_cr_instance.resources[0].status.run_result
 
     - block:
+        # Do not de-provision IMS if the instance did not get far
+        - block:
+            - name: No provisioning status found. Exiting....
+              meta: end_host
+          when: 
+            - tmdb_cr_instance.resources[0].status.run_result is not defined 
+            # - tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation'
+            # - k8s_managed
+
         # Do not de-provision IMS if the instance is in 'failedInputValidation' status
         - block:
             - name: Failed duplicate instance found. No de-provisioning. Exiting....
-              debug: 
-                  msg: ''
-            - meta: end_host
+              meta: end_host
           when: 
             - tmdb_cr_instance.resources[0].status.run_result is defined 
             - tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation'
@@ -57,14 +75,6 @@
           meta: noop
 
       always:
-        # - block:
-        #   - debug:
-        #       var: ansible_failed_task
-        #   when: ansible_failed_task is defined
-        # - block:
-        #   - debug:
-        #       var: ansible_failed_result
-        #   when: ansible_failed_result is defined
         - name: Delete the temporary provision files directory {{ tmdb_tmp_dir.path }}
           file:
             path: "{{ tmdb_tmp_dir.path }}"
@@ -77,7 +87,3 @@
 
       vars:
         uss_file_path: '{{ tmdb_tmp_dir.path }}'
-
-
-  # handlers:
-  #   - include: handlers/handlers.yml
