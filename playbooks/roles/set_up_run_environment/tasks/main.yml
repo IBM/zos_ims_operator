@@ -171,7 +171,12 @@
   - name: Create temporary directory to store templates
     tempfile:
       state: directory
-    register: tmdb_tmp_dir
+    register: this_tmp_dir
+    when: tmdb_cr_instance.resources[0].status.templates_path is not defined
+
+  - name: Set temporary directory to store templates
+    set_fact:
+      tmdb_tmp_dir: '{{this_tmp_dir.path}}'
     when: tmdb_cr_instance.resources[0].status.templates_path is not defined
 
   - name: Overwrite template path with existing one for reconcile run

@@ -20,4 +20,4 @@
           name: send-templates
         vars:
           template_path: '{{ eager_role_path }}/templates/provision/*'
-          uss_file_path: '{{ tmdb_tmp_dir.path }}'
+          uss_file_path: '{{ tmdb_tmp_dir }}'

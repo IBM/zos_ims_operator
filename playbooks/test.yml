@@ -22,15 +22,27 @@
   tasks:
   - block:
 
-      - name: Retrieve z/OS proclib dataset
-        raw: pproc
-        register: proclib_ds
+    # # Query IMS-managed ACB status
+    # - name: Query IMS-managed ACB status
+    #   ims_command:
+    #     # command: QUERY MEMBER TYPE(IMS) SHOW(ATTRIB)
+    #     command: DIS ACT
+    #     plex:  '{{ DFS_IMSPlex }}'
+    #   register: macb_status
+    #   #ignore_errors: true
+
+    # - name: '{{macb_status.ims_output[0].type_2_response[0]}}'
+    #   meta: noop
+
+      # - name: Retrieve z/OS proclib dataset
+      #   raw: pproc
+      #   register: proclib_ds
         
-      # - name: ims command
-      #   ims_command:
-      #     command:  "QUERY MEMBER TYPE(IMS) SHOW(ATTRIB)"
-      #     plex:  'PLXWZ'
-      #     route: 'IMWZ'
+      - name: ims command
+        ims_command:
+          command:  "QUERY MEMBER TYPE(IMS) SHOW(ATTRIB)"
+          plex:  'PLXWZ'
+          route: 'IMWZ'
 
 
 

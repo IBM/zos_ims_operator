@@ -23,16 +23,17 @@
       when: cmd_output.content is defined and "NOT FOUND" in cmd_output.content | join
       
     - block:
-
-      # Start IMS control region if start_ctl is true
-      - name: Start IMS control region
-        zos_operator:
-          cmd: 's {{ DFS_IMS_SSID }}CTL'
-          verbose: true
-        # when: ctl == "start" and ims_not_up
       
-      - name: wait 10 seconds for IMS to come up
-        shell: sleep 10
+      - block:
+          # Start IMS control region if IMS is not found
+          - name: Start IMS control region
+            zos_operator:
+              cmd: 's {{ DFS_IMS_SSID }}CTL'
+              verbose: true
+          
+          - name: wait 10 seconds for IMS to come up
+            shell: sleep 10
+        when: ctl == "start" and ims_not_up
 
       - name: Find joblog for {{DFS_IMS_SSID}}CTL
         zos_job_output:
@@ -48,15 +49,6 @@
             - item.ret_code.msg_text is defined
             - item.ret_code.msg_text == "AC"
         with_items: '{{dd_output.jobs}}'
-
-      # - name: Issue IMS /ERE OVERRIDE.
-      #   ims_command:
-      #     command:  "ERE OVERRIDE."
-      #     plex:  '{{ DFS_IMSPlex }}'
-      #     route: '{{ DFS_IMS_SSID }}'
-      #   when:
-      #     - active_ctl_msg is defined 
-      #     - '"DUPLICATE ENTRY ON SIGNON REQUEST" in active_ctl_msg | join'
 
       - debug:
           var: active_ctl_msg
@@ -103,7 +95,7 @@
           route: '{{ DFS_IMS_SSID }}'
         register: display_result
         
-      when: cold_start and ims_not_up
+      when: cold_start
 
     # Stop IMS control region
     - name: Stop IMS control region
@@ -112,11 +104,3 @@
         verbose: true
       when: ctl == "stop" and not ims_not_up
       # ignore_errors: true
-
-    - name: Check if {{ DFS_IMS_SSID }}HWS already Up
-      zos_operator:
-        cmd: 'd a,{{ DFS_IMS_SSID }}HWS'
-      register: cmd_output
-    - set_fact:
-        icon_not_up: true
-      when: cmd_output.content is defined and "NOT FOUND" in cmd_output.content | join

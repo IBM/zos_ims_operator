@@ -75,9 +75,9 @@
           meta: noop
 
       always:
-        - name: Delete the temporary provision files directory {{ tmdb_tmp_dir.path }}
+        - name: Delete the temporary provision files directory {{ tmdb_tmp_dir }}
           file:
-            path: "{{ tmdb_tmp_dir.path }}"
+            path: "{{ tmdb_tmp_dir }}"
             state: absent
         - name: clean up files that zoau leaves behind
           shell: rm /tmp/{{item}}*
@@ -86,4 +86,4 @@
           failed_when: output.rc | int > 1
 
       vars:
-        uss_file_path: '{{ tmdb_tmp_dir.path }}'
+        uss_file_path: '{{ tmdb_tmp_dir }}'
