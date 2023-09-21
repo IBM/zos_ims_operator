@@ -22,27 +22,64 @@
   tasks:
   - block:
 
-    # # Query IMS-managed ACB status
-    # - name: Query IMS-managed ACB status
+    # Query IMS-managed ACB status
+    - name: Query IMS-managed ACB status
+      ims_command:
+        # command: QUERY MEMBER TYPE(IMS) SHOW(ATTRIB)
+        plex:  '{{ DFS_IMSPlex }}'
+      register: macb_status
+      #ignore_errors: true
+
+    - name: IMS attributes are {{macb_status.ims_output[0].type_2_response[0].LclAttr}}
+      debug: 
+        msg: '{{macb_status}}'
+
+    # # Query RM status
+    # - name: Query RM status
     #   ims_command:
-    #     # command: QUERY MEMBER TYPE(IMS) SHOW(ATTRIB)
-    #     command: DIS ACT
+    #     command: QUERY IMSPLEX NAME(*) TYPE(RM) SHOW(STATUS)
     #     plex:  '{{ DFS_IMSPlex }}'
-    #   register: macb_status
+    #   register: rm_status
     #   #ignore_errors: true
 
-    # - name: '{{macb_status.ims_output[0].type_2_response[0]}}'
-    #   meta: noop
+    # - name: RM status is {{rm_status.ims_output[0].type_2_response[0].Status}}
+    #   debug:
+    #     msg: '{{ rm_status }}'
+
+    # # Query OM status
+    # - name: Query OM status
+    #   ims_command:
+    #     command: QUERY IMSPLEX NAME(*) TYPE(OM) SHOW(STATUS)
+    #     plex:  '{{ DFS_IMSPlex }}'
+    #   register: om_status
+    #   #ignore_errors: true
+
+    # - name: OM status is {{om_status.ims_output[0].type_2_response[0].Status}}
+    #   debug:
+    #     msg: '{{ om_status }}'
+
+    # # Query SCI status
+    # - name: Query SCI status
+    #   ims_command:
+    #     command: QUERY IMSPLEX NAME(*) TYPE(SCI) SHOW(STATUS)
+    #     plex:  '{{ DFS_IMSPlex }}'
+    #   register: sci_status
+    #   #ignore_errors: true
+
+    # - name: SCI status is {{sci_status.ims_output[0].type_2_response[0].Status}}
+    #   debug:
+    #     msg: '{{ sci_status }}'
+
 
       # - name: Retrieve z/OS proclib dataset
       #   raw: pproc
       #   register: proclib_ds
         
-      - name: ims command
-        ims_command:
-          command:  "QUERY MEMBER TYPE(IMS) SHOW(ATTRIB)"
-          plex:  'PLXWZ'
-          route: 'IMWZ'
+      # - name: ims command
+      #   ims_command:
+      #     command:  "QUERY MEMBER TYPE(IMS) SHOW(ATTRIB)"
+      #     plex:  'PLXWZ'
+      #     route: 'IMWZ'
 
 
 

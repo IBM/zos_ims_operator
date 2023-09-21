@@ -19,7 +19,8 @@
       register: macb_status
       #ignore_errors: true
 
-    - debug:
+    - name: IMS attributes are {{macb_status.ims_output[0].type_2_response[0].LclAttr}}
+      debug:
         msg: '{{ macb_status }}'
 
     # Query OM status
@@ -30,7 +31,8 @@
       register: om_status
       #ignore_errors: true
 
-    - debug:
+    - name: OM status is {{om_status.ims_output[0].type_2_response[0].Status}}
+      debug:
         msg: '{{ om_status }}'
 
     # Start OM if it's down
@@ -56,8 +58,9 @@
       register: sci_status
       #ignore_errors: true
 
-    - debug:
-        msg: '{{ sci_status.ims_output[0] }}'
+    - name: SCI status is {{sci_status.ims_output[0].type_2_response[0].Status}}
+      debug:
+        msg: '{{ sci_status }}'
 
     # Start SCI if it's down
     - block:
@@ -82,9 +85,10 @@
       register: rm_status
       #ignore_errors: true
 
-    - debug:
-        msg: '{{ rm_status.ims_output[0] }}'
-
+    - name: RM status is {{rm_status.ims_output[0].type_2_response[0].Status}}
+      debug:
+        msg: '{{ rm_status }}'
+        
     # Start RM if it's down
     - block:
 
