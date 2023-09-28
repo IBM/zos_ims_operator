@@ -268,7 +268,9 @@
                   - "PART=(NAME=DFSCX000,PART=DFSX001,"
                   - "      DSNPREFX={{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCX000,"
                   - "      KEYSTHEX=FFFFFFFFFFFFFFFFFFFFFFFFFFFF)"
-      when: catalog == "allocate" and (catalog_find_output.matched | int) == 0
+        when: not dbrc_enabled 
+
+      when: catalog == "allocate" and (catalog_find_output.matched | int) == 0 
             
     # - name: Allocate IMS catalog DB
     #   command: 'jsub -f {{ uss_file_path }}/DFSALCAT.j2'
@@ -281,10 +283,28 @@
       #   return_output: "{{ zos_job_submit_return_output }}"
       # when: catalog == "allocate" and (catalog_find_output.matched | int) == 0
 
+    - name: Defining Catalog with DBRC 
+      ibm.ibm_zos_ims.ims_dbrc:
+        command: 
+          - INIT.DB   DBD(DFSCD000) TYPHALDB SHARELVL(3)
+          - INIT.PART DBD(DFSCD000) PART(DFSCD01) DSNPREFX({{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.DFSCD000) BLOCKSZE(8192,8192,8192,8192) KEYSTRNG('DBD     ZZZZZZZZ') GENMAX(5)
+          - INIT.PART DBD(DFSCD000) PART(DFSCP01) DSNPREFX({{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.DFSCD000) BLOCKSZE(8192,8192,8192,8192) KEYSTRNG('PSB     ZZZZZZZZ') GENMAX(5)
+          - INIT.DB DBD(DFSCX000) TYPHALDB SHARELVL(3)
+          - INIT.PART DBD(DFSCX000) PART(DFSCX01) DSNPREFX({{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.DFSCX000)   GENMAX(3) KEYSTRNG(X'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF')
+          - LIST.DB DBD(DFSCD000) DBDS
+          - LIST.DB DBD(DFSCX000) DBDS
+        steplib:
+          - "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.SDFSRESL"
+        dbd_lib: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.DBDLIB"
+        recon1: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.RECON1"
+        recon2: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.RECON2"
+        recon3: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.RECON3"
+      when: catalog == "load" and dbrc_enabled
+
     - name: Load Catalog
       ims_catalog_populate:
         mode: LOAD
-        dbrc: False
+        dbrc: "{{ CATALOG_DBRC_ENABLED }}"
         modstat: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.MODSTAT"
         acb_lib: [
           "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.ACBLIB"
@@ -345,7 +365,7 @@
     - name: Update Catalog
       ims_catalog_populate:
         mode: UPDATE
-        dbrc: False
+        dbrc: "{{ CATALOG_DBRC_ENABLED }}"
         modstat: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.MODSTAT"
         acb_lib: [
           "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.ACBLIB"
@@ -430,13 +450,25 @@
           - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.A00001'
             state: absent
             volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.A00002'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
           - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.B00001'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.B00002'
             state: absent
             volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
           - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.C00001'
             state: absent
             volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.C00002'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
           - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.D00001'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.D00002'
             state: absent
             volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
           - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.L00001'
@@ -448,7 +480,13 @@
           - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.L00001.S'
             state: absent
             volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.L00002'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
           - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.X00001'
+            state: absent
+            volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
+          - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCD000.X00002'
             state: absent
             volume: "{{ DFS_DS_VOLUME1 if not DFS_SMS_ENVIRONMENT else omit }}"
           - name: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.DFSCX000.A00001'
