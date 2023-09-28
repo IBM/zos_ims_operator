@@ -100,13 +100,15 @@ ARC={{ARC}}
 CATALOG=Y                                     /*Enable IMS catalog*/
 ALIAS=DFSC                      /*Use standard catalog prefix DFSC*/
 ACBMGMT=CATALOG
-*
+IXVOLSER={{ DFS_DS_VOLUME1 }}
+ACCESS=UPDATE
+*{% if not CATALOG_DBRC_ENABLED %} 
 *----------------------------------------------------------------*
 * Database Section                                               *
 *----------------------------------------------------------------*
 <SECTION=DATABASE>
 UNREGCATLG=(DFSCX000,DFSCD000) /*Unregistered IMS catalog DB names*/
-*
+*{% endif %} 
 *--------------------------------------------------------------------*
 * END OF MEMBER DFSDF000                                             *
 *--------------------------------------------------------------------*

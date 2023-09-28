@@ -64,6 +64,7 @@
         name: ims_catalog
       vars:
         catalog: allocate
+        dbrc_enabled: "{{ CATALOG_DBRC_ENABLED }}"
       when: not ims_is_up
 
     - include_role:
@@ -133,6 +134,7 @@
         name: ims_catalog
       vars:
         catalog: setup
+        
     - include_role:
         name: ims_online_change
       vars:
@@ -148,6 +150,7 @@
         name: ims_catalog
       vars:
         catalog: load
+        dbrc_enabled: "{{ CATALOG_DBRC_ENABLED }}"
 
     - include_role:
         name: ims_region

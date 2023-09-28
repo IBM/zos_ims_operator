@@ -151,5 +151,6 @@ CSQ_SSID: CSQ1
 zCloud_IMS_SVC_Type2: '203'  #'229'
 zCloud_IMS_SVC_Type4: '202'  #'249'
 
-
+#Managed ACB Configuration
+CATALOG_DBRC_ENABLED: true
 
