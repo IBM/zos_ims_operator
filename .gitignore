@@ -1,3 +1,4 @@
 /.openshiftLogs
 *.tar.gz
 local/
+.vscode

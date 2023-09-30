@@ -299,7 +299,7 @@
         recon1: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.RECON1"
         recon2: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.RECON2"
         recon3: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.RECON3"
-      when: catalog == "load" and dbrc_enabled
+      when: catalog == "load" and dbrc_enabled and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedDup') )
 
     - name: Load Catalog
       ims_catalog_populate:

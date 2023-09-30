@@ -12,9 +12,9 @@ to determine if a playbook has access to the host’s resources. Review the
 playbook notes sections for additional details and configuration.
 
 ## Requirements
-* IBM z/OS core collection 1.5.0
+* IBM z/OS core collection 1.6.0
 * IBM z/OS IMS collection 1.2.0
-* IBM® Wazi Sandbox 2.4 or IBM® Extended z/OS® ADCD for Z Development and Test Environment built upon the general release of ADCD z/OS® V2R5 December Edition of 2022 or later
+* IBM® Wazi Sandbox 2.6 or IBM® Extended z/OS® ADCD for Z Development and Test Environment built upon the general release of ADCD z/OS® V2R5 March Edition of 2023 or later
   
 ## Getting Started
 
