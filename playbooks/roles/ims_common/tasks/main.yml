@@ -95,7 +95,7 @@
           route: '{{ DFS_IMS_SSID }}'
         register: display_result
         
-      when: cold_start
+      when: cold_start and ims_not_up
 
     # Stop IMS control region
     - name: Stop IMS control region
