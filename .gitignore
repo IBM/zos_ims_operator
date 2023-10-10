@@ -2,3 +2,4 @@
 *.tar.gz
 local/
 .vscode
+.DS_Store

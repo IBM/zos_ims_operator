@@ -75,7 +75,7 @@ homepage: https://www.ibm.com/products/z-and-cloud-modernization-stack
 build_ignore:
   - yamllint.yaml
   - .gitignore
-  - '*.tar.gz'
+  - 'ibm-zos_ims_operator-*.tar.gz'
   - .vscode 
   - handlers 
   - inventories 
