@@ -24,7 +24,7 @@ The **IBM IMS Operator collection** contains the following capabilities:
 
 * Ansible playbooks to de-provision IMS on z/OS 
 
-This Ansible collection must be used with **z/OS Cloud Broker V2.2 or newer.** For all system requirements, see the [documentation](https://www.ibm.com/docs/SSV97FN_latest/zstack/system-requirements.html).
+This Ansible collection must be used with **z/OS Cloud Broker V2.2.3 or newer.** For all system requirements, see the [documentation](https://www.ibm.com/docs/SSV97FN_latest/zstack/system-requirements.html).
 
 **Customization Guide**
 =========
