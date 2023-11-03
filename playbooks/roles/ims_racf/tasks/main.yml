@@ -1,6 +1,6 @@
 ---
 #
-# Copyright 2023 IBM Inc. All Rights Reserved
+# Copyright 2023 IBM Inc. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # RACF Security
@@ -13,24 +13,17 @@
 
     - block:
 
-      - set_fact:
-          eager_role_path: '{{role_path}}'
-
-      - include_role:
-          name: send-templates
-        vars:
-          template_path: '{{ eager_role_path }}/templates/DFSC105.j2'
-
-      when: prep_racf and not provision
-
-    - name: RACF security exits for IMS
-      zos_job_submit:
-        src: '{{ uss_file_path }}/DFSC105J.j2'
-        location: USS
-        wait: "{{ zos_job_submit_wait }}"
-        wait_time_s: "{{ zos_job_submit_wait_s }}"
-        return_output: "{{ zos_job_submit_return_output }}"
-        encoding:
-          from: ISO8859-1
-          to: IBM-1047
-      when: prep_racf
+      - name: RACF security exits for IMS
+        command: 'jsub -f {{ uss_file_path }}/DFSC105J.j2'
+        # zos_job_submit: 
+        #   max_rc: 16
+        #   src: '{{ uss_file_path }}/DFSC105J.j2'
+        #   location: USS
+        #   wait: "{{ zos_job_submit_wait }}"
+        #   wait_time_s: "{{ zos_job_submit_wait_s }}"
+        #   return_output: "{{ zos_job_submit_return_output }}"
+        #   encoding:
+        #     from: ISO8859-1
+        #     to: IBM-1047
+        # when: prep_racf
+        when: prep_racf and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )

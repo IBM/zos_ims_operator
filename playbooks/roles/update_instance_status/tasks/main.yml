@@ -1,5 +1,5 @@
 #
-# Copyright 2023 IBM Inc. All Rights Reserved
+# Copyright 2023 IBM Inc. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 - name: Update instance status block
@@ -7,15 +7,26 @@
       - ibm.ibm_zos_core
       - ibm.ibm_zos_ims
       - operator_sdk.util
+      
+  block: 
+  - name: Update CR instance run status with {{status_key}} = {{status_val}}
+    k8s_status:
+      api_version: '{{ k8s_cr_version }}'
+      kind: '{{instance_kind}}'
+      name: '{{ ansible_operator_meta.name }}'
+      namespace: '{{ ansible_operator_meta.namespace }}'
+      status:
+        run_result: '{{status_val}}'
+    delegate_to: localhost
+    when: status_key == 'run_result'
 
-  block:
-    - name: Update CR instance run status with {{status_key}} = {{status_val}}
-      k8s_status:
-        api_version: '{{ k8s_cr_version }}'
-        kind: '{{instance_kind}}'
-        name: '{{ ansible_operator_meta.name }}'
-        namespace: '{{ ansible_operator_meta.namespace }}'
-        status:
-          run_result: '{{status_val}}'
-      delegate_to: localhost
-  when: status_key == 'run_result'
+  - name: Update CR instance run status with {{status_key}} = {{status_val}}
+    k8s_status:
+      api_version: '{{ k8s_cr_version }}'
+      kind: '{{instance_kind}}'
+      name: '{{ ansible_operator_meta.name }}'
+      namespace: '{{ ansible_operator_meta.namespace }}'
+      status:
+        templates_path: '{{status_val}}'
+    delegate_to: localhost
+    when: status_key == 'templates_path'

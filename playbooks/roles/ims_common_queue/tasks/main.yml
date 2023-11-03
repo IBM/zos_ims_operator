@@ -1,6 +1,6 @@
 ---
 #
-# Copyright 2023 IBM Inc. All Rights Reserved
+# Copyright 2023 IBM Inc. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Tasks for Common Queue Services (CQS)
@@ -8,9 +8,19 @@
   collections:
     - ibm.ibm_zos_core
     - ibm.ibm_zos_ims
+  vars:
+        cqs_not_up: false
 
   block:
 
+    - name: Check if {{ DFS_IMS_SSID }}CQS already Up
+      zos_operator:
+        cmd: 'd a,{{ DFS_IMS_SSID }}CQS'
+      register: cmd_output
+    - set_fact:
+        cqs_not_up: true
+      when: cmd_output.content is defined and "NOT FOUND" in cmd_output.content | join
+      
     - set_fact:
         ip_config: '{{ role_path }}/templates/ip_config.txt'
         sl_config: '{{ role_path }}/templates/sl_config.txt'
@@ -36,7 +46,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: cqs == "config"
+      when: cqs == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
     - name: Copy input to member CQSSL000
       zos_mvs_raw:
@@ -56,7 +66,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: cqs == "config"
+      when: cqs == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
     - name: Copy input to member CQSSG000
       zos_mvs_raw:
@@ -76,7 +86,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: cqs == "config"
+      when: cqs == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
     - name: Copy input to member DFSSQ000
       zos_mvs_raw:
@@ -96,7 +106,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: cqs == "config"
+      when: cqs == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
     # Query CQS status
     - name: Query CQS status

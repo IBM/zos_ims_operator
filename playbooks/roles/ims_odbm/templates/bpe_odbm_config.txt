@@ -1,0 +1,14 @@
+********************************************************************
+* CONFIGURATION FILE FOR BPE FOR ODBM                              *
+********************************************************************
+LANG=ENU                            /* LANGUAGE FOR MESSAGES     */
+                                    /* (ENU = U.S. ENGLISH)      */
+#
+# DEFINITIONS FOR BPE SYSTEM TRACES
+#
+TRCLEV=(*,HIGH,BPE,PAGES=20)        /* DEFAULT TRACES TO HIGH    */
+TRCLEV=(STG,MEDIUM,BPE)             /* STORAGE TRACE             */
+TRCLEV=(CBS,MEDIUM,BPE)             /* CONTROL BLK SRVCS TRACE   */
+TRCLEV=(DISP,HIGH,BPE)              /* DISPATCHER TRACE          */
+TRCLEV=(AWE,HIGH,BPE)               /* AWE SERVER TRACE          */
+TRCLEV=(SSRV,HIGH,BPE)              /* SYSTEM SERVICE TRACE      */

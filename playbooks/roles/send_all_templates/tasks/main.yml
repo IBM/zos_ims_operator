@@ -1,0 +1,23 @@
+---
+#
+# Copyright 2023 IBM Inc. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# tasks file for initialize
+- name: send all templates to host
+  collections:
+    - ibm.ibm_zos_core
+
+  block:
+    # * Need this because Ansible lazily interprets role_path
+    # * Results in wrong paths being sent when passing vars that use role_path var
+    - block:
+
+      - set_fact:
+          eager_role_path: '{{role_path}}'
+
+      - include_role:
+          name: send-templates
+        vars:
+          template_path: '{{ eager_role_path }}/templates/provision/*'
+          uss_file_path: '{{ tmdb_tmp_dir }}'

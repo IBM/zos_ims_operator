@@ -8,87 +8,99 @@
   collections:
     - ibm.ibm_zos_core
     - ibm.ibm_zos_ims
+  vars:
+      icon_not_up: false
+      ims_not_up: false
 
   block:
-
-    # Start IMS control region if start_ctl is true
-    - name: Start IMS control region
+    - name: Check if {{ DFS_IMS_SSID }}CTL already Up
       zos_operator:
-        cmd: 's {{ DFS_IMS_SSID }}CTL'
-        verbose: true
-      when: ctl == "start"
+        cmd: 'd a,{{ DFS_IMS_SSID }}CTL'
+      register: cmd_output
+
+    - set_fact:
+        ims_not_up: true
+      when: cmd_output.content is defined and "NOT FOUND" in cmd_output.content | join
+      
+    - block:
+      
+      - block:
+          # Start IMS control region if IMS is not found
+          - name: Start IMS control region
+            zos_operator:
+              cmd: 's {{ DFS_IMS_SSID }}CTL'
+              verbose: true
+          
+          - name: wait 10 seconds for IMS to come up
+            shell: sleep 10
+        when: ctl == "start" and ims_not_up
+
+      - name: Find joblog for {{DFS_IMS_SSID}}CTL
+        zos_job_output:
+          job_name: '{{ DFS_IMS_SSID }}CTL'
+          ddname: "JESMSGLG"
+        register: dd_output
+
+      - name: Get active {{DFS_IMS_SSID}}CTL joblog
+        set_fact: 
+          active_ctl_msg: '{{item.ddnames[0].content}}'
+        when: 
+            - item.system != None 
+            - item.ret_code.msg_text is defined
+            - item.ret_code.msg_text == "AC"
+        with_items: '{{dd_output.jobs}}'
+
+      - debug:
+          var: active_ctl_msg
+
+      - name: Issue IMS /ERE
+        ims_command:
+          command:  "ERE."
+          plex:  '{{ DFS_IMSPlex }}'
+          route: '{{ DFS_IMS_SSID }}'
+        when: 
+          - active_ctl_msg is defined 
+          - '"A COLD START OR EMERGENCY RESTART IS REQUIRED" in active_ctl_msg | join'
+
+      - name: Issue IMS /ERE OVERRIDE
+        ims_command:
+          command:  "ERE OVERRIDE."
+          plex:  '{{ DFS_IMSPlex }}'
+          route: '{{ DFS_IMS_SSID }}'
+        when: 
+          - active_ctl_msg is defined 
+          - '"EMERGENCY BACKUP OR OVERRIDE" in active_ctl_msg | join'
+
+      - name: Issue /DIS ACT command
+        ims_command:
+          command: /DIS ACT
+          plex:  '{{ DFS_IMSPlex }}'
+          route: '{{ DFS_IMS_SSID }}'
+        register: display_result
+        ignore_errors: true
+
+      - name: IMS cold start
+        ims_command:
+          command:  NRE CHECKPOINT 0 FMT ALL
+          plex:  '{{ DFS_IMSPlex }}'
+          route: '{{ DFS_IMS_SSID }}'
+        when: 
+          - display_result.msg is defined 
+          - '"Success" not in display_result.msg | join'
+
+      - name: Issue /DIS ACT command
+        ims_command:
+          command: /DIS ACT
+          plex:  '{{ DFS_IMSPlex }}'
+          route: '{{ DFS_IMS_SSID }}'
+        register: display_result
+        
+      when: cold_start and ims_not_up
 
     # Stop IMS control region
     - name: Stop IMS control region
       zos_operator:
         cmd: 'c {{ DFS_IMS_SSID }}CTL'
         verbose: true
-      when: ctl == "stop"
-      ignore_errors: yes
-
-    - name: Wait for IMS ready
-      include_role:
-        name: submit-rexx
-        public: yes
-      vars:
-        rexx_name: 'WaitJob.j2'
-        max_rc: 0
-      ignore_errors: true
-      when: wait_for_job
-
-    - name: IMS cold start
-      ims_command:
-        command:  NRE CHECKPOINT 0 FMT ALL
-        plex:  '{{ DFS_IMSPlex }}'
-        route: '{{ DFS_IMS_SSID }}'
-      when: cold_start
-      register: cold_start_result
-
-    # - debug:
-    #     var:
-    #       - cold_start
-    #       - cold_start_result
-
-    # - name: Try ERE if cold start didn't work
-    #   ims_command:
-    #     command:  ERE OVERRIDE.
-    #     plex:  '{{ DFS_IMSPlex }}'
-    #     route: '{{ DFS_IMS_SSID }}'
-    #   when: cold_start and cold_start_result.stdout.failed
-
-    - name: ICON start
-      zos_job_submit:
-        src: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.JOBS({{ DFS_IMS_SSID }}HWS1)"
-        location: DATA_SET
-        wait: "{{ zos_job_submit_wait }}"
-        wait_time_s: "{{ zos_job_submit_wait_s }}"
-        return_output: "{{ zos_job_submit_return_output }}"
-      when: icon == "start"
-
-    # Start IMS Connect, for some reason, it doesn't work
-    # - name: Start ICON
-    #   zos_operator:
-    #     cmd: 's {{ DFS_IMS_SSID }}HWS1'
-    #     verbose: true
-    #   when: icon == "start"
-
-    # Stop ICON
-    - name: Stop ICON
-      zos_operator:
-        cmd: 'c {{ DFS_IMS_SSID }}HWS'
-        verbose: true
-      when: icon == "stop"
-
-  # always:
-  #   - name: Delete the temporary submit_jcl script path
-  #     file:
-  #         path: "{{ response.script_path }}"
-  #         state: absent
-  #     when: response
-  #     ignore_errors: yes
-
-
-
-# - debug:
-#     var: response
-#     verbosity: 0
+      when: ctl == "stop" and not ims_not_up
+      # ignore_errors: true

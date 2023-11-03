@@ -1,98 +1,302 @@
 ---
 #
-# Copyright 2023 IBM Inc. All Rights Reserved
+# Copyright 2023 IBM Inc. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # VARIABLE VALIDATION CHECKS
 # Checks for invalid characters in user defined variables
+- name: Validate user inputs  
+  collections:
+      - ibm.ibm_zos_core
+      - ibm.ibm_zos_ims
+  vars:
+    validation_fail: false
 
-- name: Create a dictionary for user defined input variables
-  set_fact:
-    spbd_vars: {
-      DFS_IMS_SSID: '{{DFS_IMS_SSID}}',
-      ODBM_PORTID: '{{ODBM_PORTID}}',
-      ODBM_SSLPORTID: '{{ODBM_SSLPORTID}}',
-      IMS_CONNECT_PORT: '{{IMS_CONNECT_PORT}}',
-      IMS_CONNECT_SSLPORT: '{{IMS_CONNECT_SSLPORT}}',
-      DFS_IMSPlex: '{{DFS_IMSPlex}}',
-      DFS_workingdir: '{{DFS_workingdir}}'
-    }
-    # regex pattern for the following rules:
-    #  - contains any of these: ';', '&' or '|'
-    #  - contains '$('
-    #  - contains '..'
-    #  - contains ' -' 
-    spbd_regex: '[;&|]|\.\.|\$\(| -'
-    spbd_fails: []
-
-- name: Print each user input value
-  debug:
-    msg: key {{ item.key }} and lookup {{ lookup('vars', item.key) }}
-  loop: "{{ spbd_vars | dict2items }}"
-
-- name: Check each user input for invalid characters
-  set_fact:
-    spbd_fails: "{{ spbd_fails|default([]) + [ item.value ] }}"
-  loop: "{{ spbd_vars | dict2items }}"
-  when:
-    - lookup('vars', item.key) is defined
-    - lookup('vars', item.key) | string | regex_search(spbd_regex)
-
-- name: End the play early if fail_task is set to False and user defined input variable(s) contain invalid characters
   block:
-    # Needed for uninstall scenario. End play if invalid inputs were found during uninstall so the product instance in OCP can be deleted.
-    - debug:
-        msg: "Found invalid user defined input(s). Ending the play early."
-    - meta: end_host
-  when: 
-    - spbd_fails.0 is defined
-    - not fail_task
+    - name: Create a dictionary for user defined input variables
+      set_fact:
+        spbd_vars: {
+          DFS_IMS_SSID: '{{DFS_IMS_SSID}}',
+          ODBM_PORTID: '{{ODBM_PORTID}}',
+          ODBM_SSLPORTID: '{{ODBM_SSLPORTID}}',
+          IMS_CONNECT_PORT: '{{IMS_CONNECT_PORT}}',
+          IMS_CONNECT_SSLPORT: '{{IMS_CONNECT_SSLPORT}}',
+          DFS_IMSPlex: '{{DFS_IMSPlex}}',
+          DFS_workingdir: '{{DFS_workingdir}}',
+          #Optional IMS configuration
+          DFS_DS_VOLUME1: '{{DFS_DS_VOLUME1}}',
+          DFS_AUTH_LIB_SYSHLQ1: '{{DFS_AUTH_LIB_SYSHLQ1}}',
+          DFS_AUTH_LIB_SYSHLQ2: '{{DFS_AUTH_LIB_SYSHLQ2}}',
+          DFS_AUTH_LIB_HLQ1: '{{DFS_AUTH_LIB_HLQ1}}',
+          DFS_AUTH_LIB_HLQ2: '{{DFS_AUTH_LIB_HLQ2}}',
+          DFS_SMS_ENVIRONMENT: '{{DFS_SMS_ENVIRONMENT}}',
+          DFS_SMS_CLASS: '{{DFS_SMS_CLASS}}',
+          STEPLIB: '{{STEPLIB}}',
+          #Optional z/OS Configuration 
+          JOB_CLASS: '{{JOB_CLASS}}',
+          MSG_CLASS: '{{MSG_CLASS}}',
+          zCloud_PROCLIB: '{{zCloud_PROCLIB}}',
+          zCloud_LERuntime: '{{zCloud_LERuntime}}',
+          zCloud_MACLIB: '{{zCloud_MACLIB}}',
+          zCloud_CSSLIB: '{{zCloud_CSSLIB}}'
+        }
+        # regex pattern for the following rules:
+        #  - contains any of these: ';', '&' or '|'
+        #  - contains '$('
+        #  - contains '..'
+        #  - contains ' -' 
+        spbd_regex: '[;&|]|\.\.|\$\(| -'
+        spbd_fails: []
 
-- name: Fail if one or more user defined input variables contain invalid characters
-  fail:
-    msg: "Following input variable(s) contain invalid characters: {{ spbd_fails }}"
-  when:
-    - spbd_fails.0 is defined
-    - fail_task
+    - name: Print each user input value
+      debug:
+        msg: key {{ item.key }} and lookup {{ lookup('vars', item.key) }}
+      loop: "{{ spbd_vars | dict2items }}"
 
-- name: Fail if IMSID is longer than 4 characters
-  fail:
-    msg: "IMS ID is longer than 4 characters"
-  when:
-    - DFS_IMS_SSID | length > 4
-    - fail_task
+    - name: Check each user input for invalid characters
+      set_fact:
+        spbd_fails: "{{ spbd_fails|default([]) + [ item.value ] }}"
+      loop: "{{ spbd_vars | dict2items }}"
+      when:
+        - lookup('vars', item.key) is defined
+        - lookup('vars', item.key) | string | regex_search(spbd_regex)
 
-- name: Fail if IMSPLEX is longer than 5 characters
-  fail:
-    msg: "IMSPlex name is longer than 5 characters"
-  when:
-    - DFS_IMSPlex | length > 5
-    - fail_task
+    - name: End the play early if fail_task is set to False and user defined input variable(s) contain invalid characters
+      block:
+        # Needed for uninstall scenario. End play if invalid inputs were found during uninstall so the product instance in OCP can be deleted.
+        - set_fact:
+            validation_fail: true
+        - debug:
+            msg: "Found invalid user defined input(s). Ending the play early."
+        - meta: end_host
+      when: 
+        - spbd_fails.0 is defined
+        - not fail_task
 
-- name: Fail if ODBM_PORTID is valid
-  fail:
-    msg: "ODBM port should be between 1 and 65535"
-  when:
-    - ODBM_PORTID <= 0 or ODBM_PORTID > 65535
-    - fail_task
+    - name: Fail if one or more user defined input variables contain invalid characters
+      block:  
+        - set_fact:
+            validation_fail: true
+        - fail:
+            msg: "Following input variable(s) contain invalid characters: {{ spbd_fails }}"
+      when:
+        - spbd_fails.0 is defined
+        - fail_task
 
-- name: Fail if IMS_CONNECT_PORT is valid
-  fail:
-    msg: "IMS Connect port should be between 1 and 65535"
-  when:
-    - IMS_CONNECT_PORT <= 0 or IMS_CONNECT_PORT > 65535
-    - fail_task
+    - name: Fail if IMSID is longer than 4 characters
+      block:
+        - set_fact:
+            validation_fail: true
+        - fail:
+            msg: "IMS ID is longer than 4 characters"
+      when:
+        - DFS_IMS_SSID | length > 4
+        - fail_task
 
-- name: Fail if ODBM_SSLPORTID is valid
-  fail:
-    msg: "ODBM SSL port should be between 1 and 65535"
-  when:
-    - ODBM_SSLPORTID <= 0 or ODBM_SSLPORTID > 65535
-    - fail_task
+    - name: Fail if IMSPLEX is longer than 5 characters
+      block:
+        - set_fact:
+            validation_fail: true
+        - fail:
+            msg: "IMSPlex name is longer than 5 characters"
+      when:
+        - DFS_IMSPlex | length > 5
+        - fail_task
 
-- name: Fail if IMS_CONNECT_SSLPORT is valid
-  fail:
-    msg: "IMS Connct SSL port should be between 1 and 65535"
-  when:
-    - IMS_CONNECT_SSLPORT <= 0 or IMS_CONNECT_SSLPORT > 65535
-    - fail_task
+    - name: Fail if ODBM_PORTID is valid
+      block:
+        - set_fact:
+            validation_fail: true
+        - fail:
+            msg: "ODBM port should be between 1 and 65535"
+      when:
+        - ODBM_PORTID <= 0 or ODBM_PORTID > 65535
+        - fail_task
+
+    - name: Fail if IMS_CONNECT_PORT is valid
+      block:
+        - set_fact:
+            validation_fail: true
+        - fail:
+            msg: "IMS Connect port should be between 1 and 65535"
+      when:
+        - IMS_CONNECT_PORT <= 0 or IMS_CONNECT_PORT > 65535
+        - fail_task
+
+    - name: Fail if ODBM_SSLPORTID is valid
+      block:
+        - set_fact:
+            validation_fail: true
+        - fail:
+            msg: "ODBM SSL port should be between 1 and 65535"
+      when:
+        - ODBM_SSLPORTID <= 0 or ODBM_SSLPORTID > 65535
+        - fail_task
+
+    - name: Fail if IMS_CONNECT_SSLPORT is valid
+      block:
+        - set_fact:
+            validation_fail: true
+        - fail:
+            msg: "IMS Connct SSL port should be between 1 and 65535"
+      when:
+        - IMS_CONNECT_SSLPORT <= 0 or IMS_CONNECT_SSLPORT > 65535
+        - fail_task
+
+    #Optional IMS configuration 
+    - name: Fail if DFS_DS_VOLUME1 is longer than 6 characters
+      block:
+        - set_fact:
+            validation_fail: true
+        - fail:
+            msg: "DFS_DS_VOLUME1 is longer than 6 characters"
+      when:
+        - DFS_DS_VOLUME1 | length > 6
+        - fail_task
+
+    - name: Fail if DFS_AUTH_LIB_HLQ1 is longer than 8 characters
+      block:
+        - set_fact:
+            validation_fail: true
+        - fail:
+            msg: DFS_AUTH_LIB_HLQ1 is longer than 8 characters
+      when:
+        - DFS_AUTH_LIB_HLQ1 | length > 8
+        - fail_task
+
+    - name: Fail if DFS_AUTH_LIB_HLQ2 is longer than 8 characters
+      block:
+        - set_fact:
+            validation_fail: true
+        - fail:
+            msg: DFS_AUTH_LIB_HLQ2 is longer than 8 characters
+      when:
+        - DFS_AUTH_LIB_HLQ2 | length > 8
+        - fail_task
+
+    - name: Fail if DFS_AUTH_LIB_SYSHLQ1 is longer than 8 characters
+      block:
+        - set_fact:
+            validation_fail: true
+        - fail:
+            msg: DFS_AUTH_LIB_SYSHLQ1 is longer than 8 characters
+      when:
+        - DFS_AUTH_LIB_SYSHLQ1 | length > 8
+        - fail_task
+
+    - name: Check if DFS_AUTH_LIB_SYSHLQ2 is defined 
+      block:
+        - block:
+          - name: Fail if DFS_AUTH_LIB_SYSHLQ2 is longer than 8 characters
+            fail:
+              msg: DFS_AUTH_LIB_SYSHLQ2 is longer than 8 characters
+          - set_fact:
+              validation_fail: true
+          when:
+            - DFS_AUTH_LIB_SYSHLQ2 | length > 8
+            - fail_task
+      when: DFS_AUTH_LIB_SYSHLQ2 != None
+
+    - name: Fail if DFS_SMS_CLASS is longer than 8 characters
+      block:
+        - set_fact:
+            validation_fail: true
+        - fail:
+            msg: DFS_SMS_CLASS is longer than 8 characters
+      when:
+        - DFS_SMS_CLASS | length > 8
+        - fail_task
+
+    - name: 'IMS {{ STEPLIB }} exists?'
+      zos_find:
+          patterns: '{{ STEPLIB }}'
+      register: zos_find_output
+    - name: "IMS {{ STEPLIB }} doesn't exists?"
+      block:
+        - set_fact:
+            validation_fail: true
+        - fail: 
+            msg: " IMS {{ STEPLIB }} doesn't exists"
+      when: zos_find_output.matched != 1 
+
+    #Optional z/OS configuration
+    - name: Fail if JOB_CLASS is longer than 1 characters
+      block:
+        - set_fact:
+            validation_fail: true
+        - fail:
+            msg: "JOB_CLASS is longer than 1 characters"
+      when:
+        - JOB_CLASS | length > 1
+        - fail_task
+
+    - name: Fail if MSG_CLASS is longer than 1 characters
+      block:
+        - set_fact:
+            validation_fail: true
+        - fail:
+            msg: "MSG_CLASS is longer than 1 characters"
+      when:
+        - MSG_CLASS | length > 1
+        - fail_task
+
+    - name: '{{ zCloud_CSSLIB }} exists?'
+      zos_find:
+          patterns: '{{ zCloud_CSSLIB }}'
+      register: zos_find_output
+    - name: "{{ zCloud_CSSLIB }} doesn't exists?"
+      block:
+        - set_fact:
+            validation_fail: true
+        - fail: 
+            msg: "{{ zCloud_CSSLIB }} doesn't exists"
+      when: zos_find_output.matched != 1 
+
+    - name: '{{ zCloud_MACLIB }} exists?'
+      zos_find:
+          patterns: '{{ zCloud_MACLIB }}'
+      register: zos_find_output
+    - name: "{{ zCloud_MACLIB }} doesn't exists?"
+      block:
+        - set_fact:
+            validation_fail: true
+        - fail: 
+            msg: "{{ zCloud_MACLIB }} doesn't exists"
+      when: zos_find_output.matched != 1 
+
+    - name: '{{ zCloud_PROCLIB }} exists?'
+      zos_find:
+          patterns: '{{ zCloud_PROCLIB }}'
+      register: zos_find_output
+    - name: "{{ zCloud_PROCLIB }} doesn't exists?"
+      block:
+        - set_fact:
+            validation_fail: true
+        - fail: 
+            msg: "{{ zCloud_PROCLIB }} doesn't exists"
+      when: zos_find_output.matched != 1 
+
+    - name: '{{ zCloud_LERuntime }} exists?'
+      zos_find:
+          patterns: '{{ zCloud_LERuntime }}'
+      register: zos_find_output
+    - name: "{{ zCloud_LERuntime }} doesn't exists?"
+      block:
+        - set_fact:
+            validation_fail: true
+        - fail: 
+            msg: "{{ zCloud_LERuntime }} doesn't exists"
+      when: zos_find_output.matched != 1 
+
+  always:
+    - block: 
+        - name: Update CR instance run status
+          include_role:
+            name: update_instance_status
+          vars:
+            status_val: 'failedInputValidation'
+            status_key: 'run_result'
+            instance_kind: TMDB
+        - fail:
+            msg: Input Validation Failed
+      when: validation_fail

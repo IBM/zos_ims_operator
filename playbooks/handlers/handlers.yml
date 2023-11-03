@@ -1,0 +1,56 @@
+---
+# - name: Notify Kubernetes
+#   delegate_to: localhost
+#   operator_sdk.util.k8s_status:
+#     api_version: ims.ibm.com/v1alpha1
+#     kind: TMDB
+#     name: '{{ meta.name }}'
+#     namespace: '{{ meta.namespace }}'
+#     status:
+#       conditions:
+#         - message: "{{ k8s_status }}"
+#           reason: Running
+#           status: 'True'
+#           type: Running
+
+# - name: MPP Notify Kubernetes
+#   delegate_to: localhost
+#   operator_sdk.util.k8s_status:
+#     api_version: ims.ibm.com/v1alpha1
+#     kind: MPP
+#     name: '{{ meta.name }}'
+#     namespace: '{{ meta.namespace }}'
+#     status:
+#       conditions:
+#         - message: "{{ k8s_status }}"
+#           reason: Running
+#           status: 'True'
+#           type: Running
+
+# - name: JMP Notify Kubernetes
+#   delegate_to: localhost
+#   operator_sdk.util.k8s_status:
+#     api_version: ims.ibm.com/v1alpha1
+#     kind: JMP
+#     name: '{{ meta.name }}'
+#     namespace: '{{ meta.namespace }}'
+#     status:
+#       conditions:
+#         - message: "{{ k8s_status }}"
+#           reason: Running
+#           status: 'True'
+#           type: Running
+
+# - name: APP Notify Kubernetes
+#   delegate_to: localhost
+#   operator_sdk.util.k8s_status:
+#     api_version: ims.ibm.com/v1alpha1
+#     kind: APP
+#     name: '{{ meta.name }}'
+#     namespace: '{{ meta.namespace }}'
+#     status:
+#       conditions:
+#         - message: "{{ k8s_status }}"
+#           reason: Running
+#           status: 'True'
+#           type: Running

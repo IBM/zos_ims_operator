@@ -8,11 +8,18 @@
   collections:
     - ibm.ibm_zos_core
     - ibm.ibm_zos_ims
+  vars:
+    ims_not_up: false
 
   block:
+    - name: Check if {{ DFS_IMS_SSID }}CTL already Up
+      zos_operator:
+        cmd: 'd a,{{ DFS_IMS_SSID }}CTL'
+      register: cmd_output
 
-    # - include_role:
-    #     name: install-bzip2
+    - set_fact:
+        ims_not_up: true
+      when: cmd_output.content is defined and "NOT FOUND" in cmd_output.content | join
 
 
     - name: Stop all IMS resources
@@ -28,6 +35,7 @@
             plex: '{{ DFS_IMSPlex }}'
             route: '{{ DFS_IMS_SSID }}'
       ignore_errors: true
+      when: not ims_not_up
 
     - name: Immediate IMS Shutdown
       ims_command:
@@ -35,16 +43,23 @@
         plex: '{{ DFS_IMSPlex }}'
         route: '{{ DFS_IMS_SSID }}'
       ignore_errors: true
+      register: che_freeze_result
+      when: not ims_not_up
+
+    - name: Cancel IMS control region because /che freeze didn't work
+      zos_operator:
+        cmd: 'c {{ DFS_IMS_SSID }}CTL'
+        verbose: true
+      when: 
+        - che_freeze_result.msg is defined 
+        - '"Success" not in che_freeze_result.msg | join'
 
     # Stop ICON
     - block:
       - include_role:
-          name: ims_common
+          name: ims_connect
         vars:
           icon: stop
-          ctl: ""
-          wait_for_job: false
-          cold_start: false
 
     # Stop ODBM
     - include_role:
@@ -89,11 +104,6 @@
         vars:
           catalog: delete
 
-    - block:
-      - include_role:
-          name: ims_iefjobs
-        vars:
-          iefjobs: delete
 
     - block:
       - include_role:

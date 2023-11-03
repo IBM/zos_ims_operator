@@ -1,6 +1,6 @@
 ---
 #
-# Copyright 2023 IBM Inc. All Rights Reserved
+# Copyright 2023 IBM Inc. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # MPP Services
@@ -16,4 +16,4 @@
           command: 'STOP REGION JOBNAME {{ DFS_IMS_SSID }}MPP{{ item }}'
           plex: '{{ DFS_IMSPlex }}'
         with_sequence: start={{ REGION_NUM }} end={{ REGION_NUM }}
-        ignore_errors: true
+        #ignore_errors: true

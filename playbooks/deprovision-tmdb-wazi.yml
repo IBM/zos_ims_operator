@@ -1,6 +1,6 @@
 ---
 #
-# Copyright 2023 IBM Inc. All Rights Reserved
+# Copyright 2023 IBM Inc. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 - name: IMS TMDB De-provisioning
@@ -9,6 +9,7 @@
   # * Include different variable files depending on environment/inventory used
   vars_files:
     - vars_wazi/ims-dbdc.yml
+    - vars_wazi/ims-zos.yml
   environment: '{{ system_environment }}'
 
   collections:
@@ -17,32 +18,72 @@
     - operator_sdk.util
 
   tasks:
-    - include_role:
-        name: set_up_run_environment
+    - name: Retrieve the TMDB instance for {{ k8s_cr_event }} event
+      k8s_info:
+          api_version: '{{ k8s_cr_version }}'
+          kind: TMDB
+          name: '{{ ansible_operator_meta.name }}'
+          namespace: '{{ ansible_operator_meta.namespace }}'
+      register: tmdb_cr_instance
+      delegate_to: 127.0.0.1
+
+    - debug:
+        var: tmdb_cr_instance.resources[0].status.run_result
 
     - block:
-        # Do not de-provision IMS if the instance is in 'failedDup' status
+        # Do not de-provision IMS if the instance did not get far
+        - block:
+            - name: No provisioning status found. Exiting....
+              meta: end_host
+          when: 
+            - tmdb_cr_instance.resources[0].status.run_result is not defined 
+            # - tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation'
+            # - k8s_managed
+
+        # Do not de-provision IMS if the instance is in 'failedInputValidation' status
         - block:
             - name: Failed duplicate instance found. No de-provisioning. Exiting....
-              debug: 
-                  msg: ''
-            - meta: end_host
+              meta: end_host
           when: 
             - tmdb_cr_instance.resources[0].status.run_result is defined 
-            - tmdb_cr_instance.resources[0].status.run_result == 'failedDup'
-            - k8s_managed
+            - tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation'
+            # - k8s_managed
+
+        - name: Deprovisioning starting.... 
+          include_role:
+            name: update_instance_status
+          vars:
+            status_key: 'run_result'
+            status_val: 'Deprovisioning in progress...'
+            instance_kind: TMDB
+
+        - include_role:
+            name: set_up_run_environment
 
         - include_role:
             name: deprovision_ims
+        
+        - name: Update CR instance run status
+          include_role:
+            name: update_instance_status
+          vars:
+            status_key: 'run_result'
+            status_val: 'Deprovision completed'
+            instance_kind: TMDB
+    
+        - name: Deprovisioning Complete!
+          meta: noop
 
       always:
-        - name: Delete the temporary provision files directory
+        - name: Delete the temporary provision files directory {{ tmdb_tmp_dir }}
           file:
-            path: "{{ tmdb_tmp_dir.path }}"
+            path: "{{ tmdb_tmp_dir }}"
             state: absent
+        - name: clean up files that zoau leaves behind
+          shell: rm /tmp/{{item}}*
+          with_sequence: 0-9
+          register: output
+          failed_when: output.rc | int > 1
+
       vars:
-        uss_file_path: '{{ tmdb_tmp_dir.path }}'
-
-
-  handlers:
-    - include: handlers/handlers.yml
+        uss_file_path: '{{ tmdb_tmp_dir }}'

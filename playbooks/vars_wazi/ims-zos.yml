@@ -1,0 +1,35 @@
+#
+# Copyright 2023 IBM Inc. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# ---------------------------------------------------------------------------- #
+#                            job related settings                              #
+# ---------------------------------------------------------------------------- #
+JOB_CLASS: A
+MSG_CLASS: H
+
+# ---------------------------------------------------------------------------- #
+#                            system libraries                                  #
+# ---------------------------------------------------------------------------- #
+# The language environment runtime dataset to use
+zCloud_LERuntime: CEE.SCEERUN
+
+# Dataset containing zos MACLIB 
+zCloud_MACLIB: SYS1.MACLIB
+
+# Dataset containing zos CSS library
+zCloud_CSSLIB: SYS1.CSSLIB
+
+zCloud_PROCLIB: SYS1.PROCLIB
+zCloud_MODGEN: SYS1.MODGEN
+
+# ---------------------------------------------------------------------------- #
+#                            TCP/TLS configuration                             #
+# ---------------------------------------------------------------------------- #
+TCPIP_PROFILE:  ADCD.{{ZOS_RELEASE}}.TCPPARMS(PROFILE)
+TCPIP_PROFILE_TLS:  ADCD.{{ZOS_RELEASE}}.TCPPARMS(TLSPOLY1)
+# A dataset is needed to store a TCPIP profile containing
+# changes to the default for dynamic port reservation
+# TCPIP_PROFILE_TMP is the name of the temporary dataset
+# or dataset member to store the profile changes
+TCPIP_PROFILE_TMP_MEMBER: IMSPROF

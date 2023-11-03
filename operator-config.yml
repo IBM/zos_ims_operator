@@ -5,7 +5,7 @@
 name: zos-ims-operator
 displayName: IBM Z and Cloud Modernization Stack - IMS Operator
 domain: ibm
-version: 1.1.0
+version: 1.2.0
 inventoryName: zosendpoint
 description: >- # TODO Can also be a path to a markdown file?
   # IBM Z and Cloud Modernization Stack - IMS Operator 
@@ -54,6 +54,7 @@ resources:
           Refer to the IBM Z and Cloud Modernization Stack Community page https://ibm.biz/z-modernization-stack-community to read the corresponding license for 
           the IBM Z and Cloud Modernization Stack - IMS Operator version selected. 
           I certify that I have read and accept the terms of the IBM® license that covers the deployment of this software.
+      
       - name: DFS_IMS_SSID
         displayName: SSID
         description: The IMSID of this instance (https://ibm.biz/BdPbuM)
@@ -96,3 +97,100 @@ resources:
         required: true
         type: string
         default: '/u/ibmuser'
+
+      - name: Optional_IMS_Configuration 
+        displayName: Optional IMS Configuration 
+        description: More advanced IMS configuation options 
+        type: object
+        array: false
+        required: false
+        objectVariables: 
+          - name: DFS_DS_VOLUME1
+            displayName: Volume
+            description: The volume to store IMS datasets
+            type: string
+            required: false 
+          - name: DFS_AUTH_LIB_SYSHLQ1
+            displayName: IMS Source Location 1
+            description: The location that contains IMS source files to be installed
+            type: string
+            default: DFSF10
+            required: false
+          - name: DFS_AUTH_LIB_SYSHLQ2
+            displayName: IMS Source Location 2
+            description: The second qualifier address for the IMS source files (if applicable)
+            type: string
+            required: false
+          - name: DFS_AUTH_LIB_HLQ1
+            displayName: IMS Install Location 1
+            description: The first qualifier for the IMS install location
+            type: string
+            default: IMSTEST
+            required: false
+          - name: DFS_AUTH_LIB_HLQ2
+            displayName: IMS Install Location 2
+            description: The second qualifier for the IMS install location
+            type: string
+            required: false
+          - name: DFS_SMS_ENVIRONMENT
+            displayName: SMS Enabled
+            description: Indicates if the IMS install volume is managed by the storage management subsystem (SMS)
+            type: boolean
+            default: true
+            required: false
+          - name: DFS_SMS_CLASS
+            displayName: SMS Storage Class
+            description: Indicates what storage class the install volume uses (only applicable if SMS managed)
+            type: string
+            default: SCIMS
+            required: false
+          - name: STEPLIB
+            displayName: The IMS STEPLIB
+            description: Location of the IMS PROCLIB
+            type: string
+            default: DFSF10.SDFSRESL
+            required: false
+
+      - name: Optional_zOS_Configuration
+        displayName: Optional z/OS Configuration 
+        description: More advanced z/OS configuation options 
+        type: object
+        array: false
+        required: false
+        objectVariables: 
+          - name: JOB_CLASS
+            displayName: Job Class
+            description: The job class
+            type: string
+            default: A
+            required: false
+          - name: MSG_CLASS
+            displayName: Message Class
+            description: The message class
+            type: string
+            default: H
+            required: false
+          - name: zCloud_PROCLIB
+            displayName: System PROCLIB
+            description: Location of the System PROCLIB
+            type: string
+            default: SYS1.PROCLIB
+            required: false
+          - name: zCloud_LERuntime
+            displayName: System LE Runtime dataset
+            description: Location of the System LE Runtime dataset
+            type: string
+            default: CEE.SCEERUN
+            required: false
+          - name: zCloud_MACLIB
+            displayName: System MACLIB
+            description: Location of the System MACLIB
+            type: string
+            default: SYS1.MACLIB
+            required: false
+          - name: zCloud_CSSLIB
+            displayName: System CSSLIB
+            description: Location of the System CSSLIB
+            type: string
+            default: SYS1.CSSLIB
+            required: false
