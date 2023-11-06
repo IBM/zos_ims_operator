@@ -1,6 +1,6 @@
 ---
 #
-# Copyright 2023 IBM Inc. All Rights Reserved
+# Copyright 2023 IBM Inc. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # tasks file for monitor_ims
@@ -11,15 +11,28 @@
 
   block:
 
+    # Query IMS-managed ACB status
+    - name: Query IMS-managed ACB status
+      ims_command:
+        command: QUERY MEMBER TYPE(IMS) SHOW(ATTRIB)
+        plex:  '{{ DFS_IMSPlex }}'
+      register: macb_status
+      #ignore_errors: true
+
+    - name: IMS attributes are {{macb_status.ims_output[0].type_2_response[0].LclAttr}}
+      debug:
+        msg: '{{ macb_status }}'
+
     # Query OM status
     - name: Query OM status
       ims_command:
         command: QUERY IMSPLEX NAME(*) TYPE(OM) SHOW(STATUS)
         plex:  '{{ DFS_IMSPlex }}'
       register: om_status
-      ignore_errors: true
+      #ignore_errors: true
 
-    - debug:
+    - name: OM status is {{om_status.ims_output[0].type_2_response[0].Status}}
+      debug:
         msg: '{{ om_status }}'
 
     # Start OM if it's down
@@ -43,10 +56,11 @@
         command: QUERY IMSPLEX NAME(*) TYPE(SCI) SHOW(STATUS)
         plex:  '{{ DFS_IMSPlex }}'
       register: sci_status
-      ignore_errors: true
+      #ignore_errors: true
 
-    - debug:
-        msg: '{{ sci_status.ims_output[0] }}'
+    - name: SCI status is {{sci_status.ims_output[0].type_2_response[0].Status}}
+      debug:
+        msg: '{{ sci_status }}'
 
     # Start SCI if it's down
     - block:
@@ -69,11 +83,12 @@
         command: QUERY IMSPLEX NAME(*) TYPE(RM) SHOW(STATUS)
         plex:  '{{ DFS_IMSPlex }}'
       register: rm_status
-      ignore_errors: true
+      #ignore_errors: true
 
-    - debug:
-        msg: '{{ rm_status.ims_output[0] }}'
-
+    - name: RM status is {{rm_status.ims_output[0].type_2_response[0].Status}}
+      debug:
+        msg: '{{ rm_status }}'
+        
     # Start RM if it's down
     - block:
 
@@ -88,34 +103,3 @@
           rm: start
 
       when: rm_status.ims_output[0].type_2_response[0].Status == 'ABENDED'
-
-
-    - name: Query IMS Connect
-      ims_command:
-        command: QUERY IMSCON TYPE(CONFIG) SHOW(ALL)
-        plex: '{{ DFS_IMSPlex }}'
-      register: imscon_status
-      ignore_errors: true
-
-    - debug:
-        msg: '{{ imscon_status.ims_output[0] }}'
-
-    - block:
-
-      - name: ICON start
-        zos_job_submit:
-          src: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.JOBS({{ DFS_IMS_SSID }}HWS1)"
-          location: DATA_SET
-          wait: "{{ zos_job_submit_wait }}"
-          wait_time_s: "{{ zos_job_submit_wait_s }}"
-          return_output: "{{ zos_job_submit_return_output }}"
-
-      when: imscon_status.failed
-
-    - name: Update CR instance run status
-      include_role:
-        name: update_instance_status
-      vars:
-        status_val: 'provisioning done...'
-        status_key: 'run_result'
-        instance_kind: TMDB

@@ -1,0 +1,15 @@
+//******************************************************************
+//*  DFSBMP Job
+//*
+//*  This job is used to execute the IMSBATCH procedure,
+//*  which executes an IMS online batch message processing
+//*  address space.
+//*
+//******************************************************/
+//* Copyright 2023 IBM Inc. All Rights Reserved.       
+//* SPDX-License-Identifier: Apache-2.0                        
+//******************************************************/
+//*
+//BMPJOB   JOB 1,IMS,MSGLEVEL=1,PRTY=11,CLASS=A,MSGCLASS=A,REGION=52K
+//       EXEC IMSBATCH,
+//            IMSID={{ DFS_IMS_SSID }}

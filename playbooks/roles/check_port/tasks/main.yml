@@ -1,6 +1,6 @@
 ---
 #
-# Copyright 2023 IBM Inc. All Rights Reserved
+# Copyright 2023 IBM Inc. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # tasks file for check_port
@@ -30,26 +30,30 @@
           include_role:
             name: update_instance_status
           vars:
-            status_val: 'failedDup'
+            status_val: 'failedInputValidation'
             status_key: 'run_result'
             instance_kind: TMDB
         - name: Is port {{ODBM_PORTID}} already reserved?
           fail:
             msg: port {{ ODBM_PORTID }} is reserved
-      when: '"{{ODBM_PORTID}}" in reserved_port_list.output[0].content  | join'
+      when: 
+        - '"{{ODBM_PORTID}}" in reserved_port_list.output[0].content  | join' 
+        - not reconcile_run or ( reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation')
 
     - block:
         - name: Update CR instance run status
           include_role:
             name: update_instance_status
           vars:
-            status_val: 'failedDup'
+            status_val: 'failedInputValidation'
             status_key: 'run_result'
             instance_kind: TMDB
         - name: Is port {{ ODBM_PORTID }} is in use?
           fail:
             msg: port {{ ODBM_PORTID }} is in use
-      when: '"..{{ODBM_PORTID}}" in inuse_port_list.output[0].content  | join'
+      when: 
+        - '"..{{ODBM_PORTID}}" in inuse_port_list.output[0].content  | join' 
+        - not reconcile_run or ( reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation')
 
 
     - block:
@@ -57,13 +61,15 @@
           include_role:
             name: update_instance_status
           vars:
-            status_val: 'failedDup'
+            status_val: 'failedInputValidation'
             status_key: 'run_result'
             instance_kind: TMDB
         - name: Is port {{ ODBM_SSLPORTID }} reserved?
           fail:
             msg: port {{ ODBM_SSLPORTID }} is reserved
-      when: '"{{ODBM_SSLPORTID}}" in reserved_port_list.output[0].content  | join'
+      when: 
+        - '"{{ODBM_SSLPORTID}}" in reserved_port_list.output[0].content  | join' 
+        - not reconcile_run or ( reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation')
 
 
     - block:
@@ -71,13 +77,15 @@
           include_role:
             name: update_instance_status
           vars:
-            status_val: 'failedDup'
+            status_val: 'failedInputValidation'
             status_key: 'run_result'
             instance_kind: TMDB
         - name: Is port {{ ODBM_SSLPORTID }} in use?
           fail:
             msg: port {{ ODBM_SSLPORTID }} is in use
-      when: '"..{{ODBM_SSLPORTID}}" in inuse_port_list.output[0].content  | join'
+      when: 
+        - '"..{{ODBM_SSLPORTID}}" in inuse_port_list.output[0].content  | join' 
+        - not reconcile_run or ( reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation')
 
 
     - block:
@@ -85,13 +93,15 @@
           include_role:
             name: update_instance_status
           vars:
-            status_val: 'failedDup'
+            status_val: 'failedInputValidation'
             status_key: 'run_result'
             instance_kind: TMDB
         - name: Is port {{ IMS_CONNECT_PORT }} reserved?
           fail:
             msg: port {{ IMS_CONNECT_PORT }} is reserved
-      when: '"{{IMS_CONNECT_PORT}}" in reserved_port_list.output[0].content  | join'
+      when: 
+        - '"{{IMS_CONNECT_PORT}}" in reserved_port_list.output[0].content  | join' 
+        - not reconcile_run or ( reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation')
 
 
     - block:
@@ -99,13 +109,15 @@
           include_role:
             name: update_instance_status
           vars:
-            status_val: 'failedDup'
+            status_val: 'failedInputValidation'
             status_key: 'run_result'
             instance_kind: TMDB
         - name: Is port {{ IMS_CONNECT_PORT }} in use?
           fail:
             msg: port {{ IMS_CONNECT_PORT }} is in use
-      when: '"..{{IMS_CONNECT_PORT}}" in inuse_port_list.output[0].content  | join'
+      when: 
+        - '"..{{IMS_CONNECT_PORT}}" in inuse_port_list.output[0].content  | join' 
+        - not reconcile_run or ( reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation')
 
 
     - block:
@@ -113,13 +125,15 @@
           include_role:
             name: update_instance_status
           vars:
-            status_val: 'failedDup'
+            status_val: 'failedInputValidation'
             status_key: 'run_result'
             instance_kind: TMDB
         - name: port {{ IMS_CONNECT_SSLPORT }} reserved?
           fail:
             msg: port {{ IMS_CONNECT_SSLPORT }} is reserved
-      when: '"{{IMS_CONNECT_SSLPORT}}" in reserved_port_list.output[0].content  | join'
+      when: 
+        - '"{{IMS_CONNECT_SSLPORT}}" in reserved_port_list.output[0].content  | join' 
+        - not reconcile_run or ( reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation')
 
 
     - block:
@@ -127,11 +141,13 @@
               include_role:
                 name: update_instance_status
               vars:
-                status_val: 'failedDup'
+                status_val: 'failedInputValidation'
                 status_key: 'run_result'
                 instance_kind: TMDB
             - name: Is port {{ IMS_CONNECT_SSLPORT }} in use?
               fail:
                 msg: port {{ IMS_CONNECT_SSLPORT }} is in use
-      when: '"..{{IMS_CONNECT_SSLPORT}}" in inuse_port_list.output[0].content  | join'
+      when: 
+        - '"..{{IMS_CONNECT_SSLPORT}}" in inuse_port_list.output[0].content  | join' 
+        - not reconcile_run or ( reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation')
 

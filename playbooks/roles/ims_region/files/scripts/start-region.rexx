@@ -1,10 +1,8 @@
 /* REXX */
-/*------------------------------------------------------------*/
-/*                                                            */
-/* Copyright 2023 IBM Inc. All Rights Reserved.             */
-/* SPDX-License-Identifier: Apache-2.0                        */
-/*                                                            */
-/*------------------------------------------------------------*/
+/*
+/* Copyright 2023 IBM Inc. All Rights Reserved.
+/* SPDX-License-Identifier: Apache-2.0
+/*
 /**********************************************************************/
 /* Submit a job to start a region or other long running proc.         */
 /* Check successfully started and retry n times in case we hit        */

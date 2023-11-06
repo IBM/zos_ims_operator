@@ -1,6 +1,6 @@
 ---
 #
-# Copyright 2023 IBM Inc. All Rights Reserved
+# Copyright 2023 IBM Inc. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Tasks for Structured Call Interface (SCI)
@@ -8,17 +8,23 @@
   collections:
     - ibm.ibm_zos_core
     - ibm.ibm_zos_ims
-
+  vars:
+      sci_not_up: false
+      
   block:
+
+    - name: Check if {{ DFS_IMS_SSID }}SCI already Up
+      zos_operator:
+        cmd: 'd a,{{ DFS_IMS_SSID }}SCI'
+      register: cmd_output
+    - set_fact:
+        sci_not_up: true
+      when: cmd_output.content is defined and "NOT FOUND" in cmd_output.content | join
 
     - set_fact:
         bpe_sci_config: '{{ role_path }}/templates/bpe_sci_config.txt'
         si_config: '{{ role_path }}/templates/si_config.txt'
-        sci_config: '{{ role_path }}/templates/sci_config.txt'
-
-    - name: check sci value
-      debug:
-        var: sci
+        sci_proc: '{{ role_path }}/templates/sci_proc.txt'
 
     - name: Define BPECONFG
       zos_mvs_raw:
@@ -27,7 +33,7 @@
         dds:
           - dd_data_set:
               dd_name: sysut2
-              data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(BPECONFG)"
+              data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB(BPECFSCI)"
               disposition: shr
           - dd_dummy:
               dd_name: sysin
@@ -38,7 +44,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: sci == "config"
+      when: sci == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') ) 
 
 
     - name: Add CSLSI000 member to PROCLIB
@@ -59,7 +65,7 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: sci == "config"
+      when: sci == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
 
     - name: Add SCI PROC member to PROCLIB
@@ -75,13 +81,12 @@
               dd_name: sysin
           - dd_input:
               dd_name: sysut1
-              content: "{{ lookup('template', '{{ sci_config }}') }}"
+              content: "{{ lookup('template', '{{ sci_proc }}') }}"
           - dd_output:
               dd_name: sysprint
               return_content:
                 type: text
-      when: sci == "config"
-
+      when: sci == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
 
     - block:
 
@@ -111,14 +116,17 @@
 
         when: sci_output != 'AC'
 
-      when: sci == "start"
+      when: 
+        - sci == "start"
+        - sci_not_up
+
 
     # Stop SCI
     - name: Stop SCI
       zos_operator:
         cmd: 'c {{ DFS_IMS_SSID }}SCI'
         verbose: true
-      when: sci == "stop"
+      when: sci == "stop" and not sci_not_up
 
     # Query SCI status
     - name: Query SCI status

@@ -1,13 +1,11 @@
 ---
 #
-# Copyright 2023 IBM Inc. All Rights Reserved
+# Copyright 2023 IBM Inc. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # defaults file for provision-ims-dbdc
 send_procs: false
 
-
 ODBM_PORTIDSuf: 99
-
 
 ARC: '03'
