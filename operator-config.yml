@@ -5,8 +5,7 @@
 name: zos-ims-operator
 displayName: IBM Z and Cloud Modernization Stack - IMS Operator
 domain: ibm
-version: 1.2.0
-inventoryName: zosendpoint
+version: 1.2.1
 description: >- # TODO Can also be a path to a markdown file?
   # IBM Z and Cloud Modernization Stack - IMS Operator 
     The **IBM IMS Operator Collection** provides automation around provisioning IMS on to one or more Wazi sandboxes and managing its lifecycle in a hybrid Cloud environment. 
@@ -40,7 +39,7 @@ icon:
     mediatype: image/svg+xml;base64
 resources:
   - kind: TMDB
-    displayName: 
+    displayName: TMDB
     description: Provision an IMS TMDB system on a Wazi sandbox
     playbook: playbooks/provision-tmdb-wazi.yml
     finalizer: playbooks/deprovision-tmdb-wazi.yml

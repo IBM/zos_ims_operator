@@ -16,6 +16,7 @@
     - name: Create a dictionary for user defined input variables
       set_fact:
         spbd_vars: {
+          STEPLIB: '{{STEPLIB}}',
           DFS_IMS_SSID: '{{DFS_IMS_SSID}}',
           ODBM_PORTID: '{{ODBM_PORTID}}',
           ODBM_SSLPORTID: '{{ODBM_SSLPORTID}}',
@@ -31,7 +32,6 @@
           DFS_AUTH_LIB_HLQ2: '{{DFS_AUTH_LIB_HLQ2}}',
           DFS_SMS_ENVIRONMENT: '{{DFS_SMS_ENVIRONMENT}}',
           DFS_SMS_CLASS: '{{DFS_SMS_CLASS}}',
-          STEPLIB: '{{STEPLIB}}',
           #Optional z/OS Configuration 
           JOB_CLASS: '{{JOB_CLASS}}',
           MSG_CLASS: '{{MSG_CLASS}}',
@@ -103,7 +103,7 @@
         - DFS_IMSPlex | length > 5
         - fail_task
 
-    - name: Fail if ODBM_PORTID is valid
+    - name: Fail if ODBM_PORTID is invalid
       block:
         - set_fact:
             validation_fail: true
@@ -113,7 +113,7 @@
         - ODBM_PORTID <= 0 or ODBM_PORTID > 65535
         - fail_task
 
-    - name: Fail if IMS_CONNECT_PORT is valid
+    - name: Fail if IMS_CONNECT_PORT is invalid
       block:
         - set_fact:
             validation_fail: true
@@ -123,7 +123,7 @@
         - IMS_CONNECT_PORT <= 0 or IMS_CONNECT_PORT > 65535
         - fail_task
 
-    - name: Fail if ODBM_SSLPORTID is valid
+    - name: Fail if ODBM_SSLPORTID is invalid
       block:
         - set_fact:
             validation_fail: true
@@ -133,7 +133,7 @@
         - ODBM_SSLPORTID <= 0 or ODBM_SSLPORTID > 65535
         - fail_task
 
-    - name: Fail if IMS_CONNECT_SSLPORT is valid
+    - name: Fail if IMS_CONNECT_SSLPORT is invalid
       block:
         - set_fact:
             validation_fail: true
