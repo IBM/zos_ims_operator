@@ -1,0 +1,82 @@
+---
+#
+# Copyright 2024 IBM Inc. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Tasks for IRLM
+- name: Internal Resource Lock Manager
+  collections:
+    - ibm.ibm_zos_core
+    - ibm.ibm_zos_ims
+  vars:
+      irlm_not_up: false
+
+  block:
+
+    - name: Check if {{ DFS_IMS_SSID }}IRLM already Up
+      zos_operator:
+        cmd: 'd a,{{ DFS_IMS_SSID }}IRLM'
+      register: cmd_output
+
+    - set_fact:
+        irlm_not_up: true
+      when: cmd_output.content is defined and "NOT FOUND" in cmd_output.content | join
+
+    - set_fact:
+        irlm_proc: '{{ role_path }}/templates/irlm_proc.jcl.j2'
+
+
+    - name: Add IRLM member to PROCLIB
+      zos_mvs_raw:
+        pgm: IEBGENER
+        auth: false
+        dds:
+          - dd_data_set:
+              dd_name: sysut2
+              data_set_name: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB({{ DFS_IMS_SSID }}IRLM)"
+              disposition: shr
+          - dd_dummy:
+              dd_name: sysin
+          - dd_input:
+              dd_name: sysut1
+              content: "{{ lookup('template', '{{ irlm_proc }}') }}"
+          - dd_output:
+              dd_name: sysprint
+              return_content:
+                type: text
+      when: irlm == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
+
+    - name: Create and start IRLM Subsystem
+      ibm.ibm_zos_core.zos_operator:
+        cmd: 'SETSSI ADD,SUBNAME={{ DXR_IRLM_SSID }}'
+        wait: true
+        wait_time_s: 10
+        verbose: true
+      when:
+        - irlm == "start"
+        - irlm_not_up
+
+    - name: Start IRLM
+      zos_operator:
+        cmd: 's {{ DFS_IMS_SSID }}IRLM'
+        wait: true
+        wait_time_s: 10
+        verbose: true
+      when: 
+        - irlm == "start"
+        - irlm_not_up
+
+    - name: Stop IRLM
+      zos_operator:
+        cmd: 'c {{ DFS_IMS_SSID }}IRLM'
+        verbose: true
+      when: irlm == "stop" and not irlm_not_up
+
+    - name: Stop and delete IRLM Subsystem
+      ibm.ibm_zos_core.zos_operator:
+        cmd: 'SETSSI DELETE,SUBNAME={{ DXR_IRLM_SSID }},FORCE'
+        wait: true
+        wait_time_s: 10
+        verbose: true
+      when: irlm == "stop" and not irlm_not_up
+
