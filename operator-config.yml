@@ -45,16 +45,6 @@ resources:
     playbook: playbooks/provision-tmdb-wazi.yml
     finalizer: playbooks/deprovision-tmdb-wazi.yml
     vars:
-      - name: accept
-        displayName: License
-        type: boolean
-        required: true
-        description: >-
-          IBM Information Management System Operator Collection license agreement must be accepted during installation of this product.
-          Refer to the IBM Z and Cloud Modernization Stack Community page https://ibm.biz/z-modernization-stack-community to read the corresponding license for 
-          the IBM Z and Cloud Modernization Stack - IMS Operator version selected. 
-          I certify that I have read and accept the terms of the IBM® license that covers the deployment of this software.
-      
       - name: DFS_IMS_SSID
         displayName: SSID
         description: The IMSID of this instance (https://ibm.biz/BdPbuM)
