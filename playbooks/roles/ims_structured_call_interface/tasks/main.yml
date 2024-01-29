@@ -95,26 +95,26 @@
         zos_operator:
           cmd: 's {{ DFS_IMS_SSID }}SCI'
           verbose: true
+      # THIS WILL NOT WORK UNTIL ZOAU 1.3 IS AVAILALBE ON ADCD
+      # - wait_for:
+      #     timeout: 10
 
-      - wait_for:
-          timeout: 10
+      # - zos_job_output:
+      #     job_name: '{{ DFS_IMS_SSID }}SCI'
+      #   register: output
 
-      - zos_job_output:
-          job_name: '{{ DFS_IMS_SSID }}SCI'
-        register: output
+      # - set_fact:
+      #     sci_output: '{{ output.jobs[0].ret_code.msg }}'
 
-      - set_fact:
-          sci_output: '{{ output.jobs[0].ret_code.msg }}'
+      # - block:
 
-      - block:
+      #   # Start SCI
+      #   - name: Start SCI
+      #     zos_operator:
+      #       cmd: 's {{ DFS_IMS_SSID }}SCI'
+      #       verbose: true
 
-        # Start SCI
-        - name: Start SCI
-          zos_operator:
-            cmd: 's {{ DFS_IMS_SSID }}SCI'
-            verbose: true
-
-        when: sci_output != 'AC'
+      #   when: sci_output != 'AC'
 
       when: 
         - sci == "start"
