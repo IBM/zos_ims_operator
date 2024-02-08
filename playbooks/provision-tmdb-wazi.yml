@@ -45,6 +45,10 @@
         include_role: 
           name: check_duplicate_imsplex
 
+      - name: Check if IRLM Subsystem already exists
+        ansible.builtin.include_role:
+          name: check_duplicate_irlm
+
       - name: Check if ports are available
         include_role:
           name: check_port

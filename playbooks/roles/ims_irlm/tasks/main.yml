@@ -25,7 +25,6 @@
     - set_fact:
         irlm_proc: '{{ role_path }}/templates/irlm_proc.jcl.j2'
 
-
     - name: Add IRLM member to PROCLIB
       zos_mvs_raw:
         pgm: IEBGENER
@@ -79,4 +78,3 @@
         wait_time_s: 10
         verbose: true
       when: irlm == "stop" and not irlm_not_up
-

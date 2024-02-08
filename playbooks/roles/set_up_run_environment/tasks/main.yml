@@ -32,6 +32,7 @@
     set_fact:
       DFS_IMS_SSID: '{{tmdb_cr_instance.resources[0].spec.DFS_IMS_SSID}}'
       DFS_IMSPlex: '{{tmdb_cr_instance.resources[0].spec.DFS_IMSPlex}}'
+      DXR_IRLM_SSID: '{{tmdb_cr_instance.resources[0].spec.DXR_IRLM_SSID}}'
       ODBM_PORTID: "{{ tmdb_cr_instance.resources[0].spec.ODBM_PORTID }}"
       ODBM_SSLPORTID: "{{ tmdb_cr_instance.resources[0].spec.ODBM_SSLPORTID }}"
       IMS_CONNECT_PORT: "{{ tmdb_cr_instance.resources[0].spec.IMS_CONNECT_PORT }}"
@@ -51,6 +52,7 @@
       instance_lastTransitionTime: "{{ tmdb_cr_instance.resources[0].status.conditions[0].lastTransitionTime[0:15]}}"
       reconcile_run: false
       ims_is_up: false
+      irlm_is_up: false
       active_hws_jobid: ""
   
 
