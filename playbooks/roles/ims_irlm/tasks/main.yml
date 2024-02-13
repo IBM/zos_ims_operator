@@ -20,7 +20,9 @@
 
     - set_fact:
         irlm_not_up: true
-      when: cmd_output.content is defined and "NOT FOUND" in cmd_output.content | join
+      when: 
+        - cmd_output.content is defined
+        - '"NOT FOUND" in cmd_output.content | join'
 
     - set_fact:
         irlm_proc: '{{ role_path }}/templates/irlm_proc.jcl.j2'
@@ -43,7 +45,10 @@
               dd_name: sysprint
               return_content:
                 type: text
-      when: irlm == "config" and ( not reconcile_run or (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation') )
+      when:
+        - irlm == "config"
+        - not reconcile_run or 
+          (reconcile_run and tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation')
 
     - name: Create and start IRLM Subsystem
       ibm.ibm_zos_core.zos_operator:
@@ -69,7 +74,9 @@
       zos_operator:
         cmd: 'c {{ DFS_IMS_SSID }}IRLM'
         verbose: true
-      when: irlm == "stop" and not irlm_not_up
+      when:
+        - irlm == "stop"
+        - not irlm_not_up
 
     - name: Stop and delete IRLM Subsystem
       ibm.ibm_zos_core.zos_operator:
@@ -77,4 +84,6 @@
         wait: true
         wait_time_s: 10
         verbose: true
-      when: irlm == "stop" and not irlm_not_up
+      when:
+        - irlm == "stop"
+        - not irlm_not_up

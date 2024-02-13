@@ -94,7 +94,7 @@ resources:
         default: PLXWZ
       - name: DXR_IRLM_SSID
         displayName: IRLM Subsystem Interface
-        description: The Subsystem Interface that IRLM will use (https://www.ibm.com/docs/en/ims/15.4.0?topic=parameters-irlmnmname-parameter-procedures)
+        description: The Subsystem Interface that IRLM will use (https://ibm.biz/Bdv8RK)
         required: true
         type: string
         default: XRLM

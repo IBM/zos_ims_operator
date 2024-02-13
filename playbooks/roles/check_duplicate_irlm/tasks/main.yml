@@ -21,18 +21,18 @@
         - irlm_output.content is defined
         - '"THERE IS NO INFORMATION TO DISPLAY" not in irlm_output.content | join'
 
-    - name: 'IRLM subsystem {{ DXR_IRLM_SSID }} already exists. Trying to reconcile...'
+    - name: 'Check if an IRLM subsystem with SSID {{ DXR_IRLM_SSID }} already exists. Trying to reconcile...'
       ansible.builtin.debug:
-        msg: 'IRLM subsystem {{ DXR_IRLM_SSID }} already exists. Trying to reconcile...'
+        msg: 'An IRLM subsystem with SSID {{ DXR_IRLM_SSID }} already exists. Trying to reconcile...'
       when:
         - reconcile_run
         - irlm_is_up
         - tmdb_cr_instance.resources[0].status.run_result != 'failedInputValidation'
 
     # Reconcile run and failedInputValidation, fail it
-    - name: 'Duplicate IRLM subsystem {{ DXR_IRLM_SSID }}. Please use a different SSID for the IRLM subsystem.'
+    - name: 'Check if an IRLM subsystem with SSID {{ DXR_IRLM_SSID }} already exists.'
       ansible.builtin.fail:
-        msg: 'Duplicate IRLM subsystem {{ DXR_IRLM_SSID }}. Please use a different SSID for the IRLM subsystem.'
+        msg: 'An IRLM subsystem with SSID {{ DXR_IRLM_SSID }} already exists. Please use a different SSID for the IRLM subsystem.'
       when: 
         - reconcile_run
         - irlm_is_up
@@ -40,16 +40,16 @@
 
     # IRLM already up and a new 'Create' comes in, fail it with 'failedInputValidation' status
     - block: 
-      - name: Update CR instance run status
+      - name: Update custom resource instance run status
         include_role:
           name: update_instance_status
         vars:
           status_val: 'failedInputValidation'
           status_key: 'run_result'
           instance_kind: TMDB
-      - name: 'Duplicate IRLM subsystem {{ DXR_IRLM_SSID }}. Please use a different SSID for the IRLM subsystem.'
+      - name: 'Check if an IRLM subsystem with SSID {{ DXR_IRLM_SSID }} already exists.'
         ansible.builtin.fail:
-          msg: 'Duplicate IRLM subsystem {{ DXR_IRLM_SSID }}. Please use a different SSID for the IRLM subsystem.'
+          msg: 'An IRLM subsystem with SSID {{ DXR_IRLM_SSID }} already exists. Please use a different SSID for the IRLM subsystem.'
       when:
         - not reconcile_run
         - irlm_is_up
