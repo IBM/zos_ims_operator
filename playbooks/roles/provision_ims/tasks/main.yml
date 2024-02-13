@@ -98,6 +98,12 @@
       vars:
         rm: config
 
+    # Call IRLM config to copy & config IRLM
+    - include_role:
+        name: ims_irlm
+      vars:
+        irlm: config
+
     # Call ODBM config to copy & config ODBM
     - include_role:
         name: ims_odbm
@@ -172,6 +178,12 @@
         name: ims_resource_manager
       vars:
         rm: start
+
+    # Start IRLM
+    - include_role:
+        name: ims_irlm
+      vars:
+        irlm: start
 
     # Start control region (CTL) before starting ODBM
     - include_role:

@@ -1,0 +1,18 @@
+//{{ DFS_IMS_SSID }}IRLM PROC  RGN=3072K,
+//            IRLMNM={{ DXR_IRLM_SSID }},
+//            IRLMID=1,
+//            SCOPE=LOCAL,
+//            DEADLOK='5,1',
+//            MAXCSA=8,
+//            PC=NO,
+//            MAXUSRS=7,
+//            LOCKTAB=IRLMT1,
+//            TRACE=YES,
+//            LTE=32
+//         EXEC PGM=DXRRLM00,
+//         PARM=(&IRLMNM,&IRLMID,&SCOPE,&DEADLOK,&MAXCSA,
+//         &PC,&MAXUSRS,&LOCKTAB,&TRACE,&LTE),
+//         REGION=&RGN
+//STEPLIB  DD DSN={{ DFS_AUTH_LIB_SYSHLQ1 }}.SDXRRESL,DISP=SHR
+//SYSPRINT DD  SYSOUT=*
+//SYSUDUMP DD  SYSOUT=*

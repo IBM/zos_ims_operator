@@ -1,0 +1,55 @@
+---
+#
+# Copyright 2024 IBM Inc. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Check if IRLM is already up
+- name: Check for duplicate IRLM
+  collections:
+      - ibm.ibm_zos_core
+      - ibm.ibm_zos_ims
+  block:
+    - name: Query IRLM subsystem
+      ibm.ibm_zos_core.zos_operator:
+        cmd: 'D SSI,SUB={{ DXR_IRLM_SSID }}'
+      register: irlm_output
+
+    - name: Check if IRLM subsystem exists 
+      ansible.builtin.set_fact:
+        irlm_is_up: true
+      when:
+        - irlm_output.content is defined
+        - '"THERE IS NO INFORMATION TO DISPLAY" not in irlm_output.content | join'
+
+    - name: 'Check if an IRLM subsystem with SSID {{ DXR_IRLM_SSID }} already exists. Trying to reconcile...'
+      ansible.builtin.debug:
+        msg: 'An IRLM subsystem with SSID {{ DXR_IRLM_SSID }} already exists. Trying to reconcile...'
+      when:
+        - reconcile_run
+        - irlm_is_up
+        - tmdb_cr_instance.resources[0].status.run_result != 'failedInputValidation'
+
+    # Reconcile run and failedInputValidation, fail it
+    - name: 'Check if an IRLM subsystem with SSID {{ DXR_IRLM_SSID }} already exists.'
+      ansible.builtin.fail:
+        msg: 'An IRLM subsystem with SSID {{ DXR_IRLM_SSID }} already exists. Please use a different SSID for the IRLM subsystem.'
+      when: 
+        - reconcile_run
+        - irlm_is_up
+        - tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation'
+
+    # IRLM already up and a new 'Create' comes in, fail it with 'failedInputValidation' status
+    - block: 
+      - name: Update custom resource instance run status
+        include_role:
+          name: update_instance_status
+        vars:
+          status_val: 'failedInputValidation'
+          status_key: 'run_result'
+          instance_kind: TMDB
+      - name: 'Check if an IRLM subsystem with SSID {{ DXR_IRLM_SSID }} already exists.'
+        ansible.builtin.fail:
+          msg: 'An IRLM subsystem with SSID {{ DXR_IRLM_SSID }} already exists. Please use a different SSID for the IRLM subsystem.'
+      when:
+        - not reconcile_run
+        - irlm_is_up

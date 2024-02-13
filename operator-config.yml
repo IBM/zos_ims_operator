@@ -24,9 +24,10 @@ description: >- # TODO Can also be a path to a markdown file?
     A sucessful provision will create an IMS system with the following features:
     1. Full TMDB environment
     2. IMSPlex (SCI, OM, RM)
-    3. IMS Connnect
+    3. IMS Connect
     4. IMS Open Database (ODBM)
     5. IMS Catalog
+    6. IMS IRLM
 
   # Limitations
     This version of the **IBM IMS Operator Collection** is designed to work only with Waze sandboxes or Extended ADCD with IMS&reg; pre-installed
@@ -80,6 +81,12 @@ resources:
         required: true
         type: string
         default: PLXWZ
+      - name: DXR_IRLM_SSID
+        displayName: IRLM Subsystem Interface
+        description: The Subsystem Interface that IRLM will use (https://ibm.biz/Bdv8RK)
+        required: true
+        type: string
+        default: XRLM
       - name: DFS_workingdir
         displayName: Temporary working directory
         description: Temporary working directory on USS for the IMS Operator
