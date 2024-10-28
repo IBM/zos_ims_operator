@@ -19,13 +19,6 @@
 
   tasks:
     - block:
-
-      # check if licence has been accepted and fail if not.
-      - name: License not accepted
-        ansible.builtin.fail:
-          msg: Product license was not accepted
-        when: not accept
-
       - name: Set up Run environment
         include_role:
           name: set_up_run_environment

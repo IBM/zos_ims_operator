@@ -21,18 +21,97 @@
 
   tasks:
   - block:
+    # - name: copy java program to zos
+    #   zos_copy:
+    #     src: /Users/adn/workspaces/nazare/nazare-demo-imsapp/nazare-ims-jmp/null/nazare-ims-jmp-1.0.0-SNAPSHOT.jar
+    #     dest: /u/ibmuser/ims/nazare-ims-jmp-1.0.0-SNAPSHOT.jar
+    #     is_binary: true
+    #     force: true
 
-    # Query IMS-managed ACB status
-    - name: Query IMS-managed ACB status
+    # - name: copy ims mpr options to zos
+    #   zos_copy:
+    #     src: /Users/adn/workspaces/nazare/nazare-demo-imsapp/UnixFiles/dfsjvmpr.props
+    #     dest: /u/ibmuser/ims/dfsjvmpr.props
+    #     force: true
+
+    # Stop region 
+    - name: Stop IMS1JMP1
       ims_command:
-        # command: QUERY MEMBER TYPE(IMS) SHOW(ATTRIB)
+        command: STOP REGION JOBNAME IMS1JMP1
         plex:  '{{ DFS_IMSPlex }}'
-      register: macb_status
-      #ignore_errors: true
+        route: '{{ DFS_IMS_SSID }}'
+      ignore_errors: true
 
-    - name: IMS attributes are {{macb_status.ims_output[0].type_2_response[0].LclAttr}}
-      debug: 
-        msg: '{{macb_status}}'
+    # Stop region
+    - name: Stop IMS1JMP2
+      ims_command:
+        command: STOP REGION JOBNAME IMS1JMP2
+        plex:  '{{ DFS_IMSPlex }}'
+        route: '{{ DFS_IMS_SSID }}'
+      ignore_errors: true
+    
+    # Start region IMS1JMP1
+    - name: Start regions
+      zos_job_submit:
+        src: IMSBANK.IMS1.JOBS(IMS1JMP)
+        location: DATA_SET
+      ignore_errors: true
+
+    # Start region IMS1JMP2
+    - name: Start regions
+      zos_job_submit:
+        src: IMSBANK.IMS1.JOBS(IMS1JMP2)
+        location: DATA_SET
+      ignore_errors: true
+
+    # Start program and tran
+    - name: Start pgm/tran
+      ims_command:
+        batch:
+          - 
+            command: STA PGM ALL
+            plex:  '{{ DFS_IMSPlex }}'
+            route: '{{ DFS_IMS_SSID }}'
+          - 
+            command: STA TRAN ALL
+            plex:  '{{ DFS_IMSPlex }}'
+            route: '{{ DFS_IMS_SSID }}'
+          - 
+            command: DIS ACT
+            plex:  '{{ DFS_IMSPlex }}'
+            route: '{{ DFS_IMS_SSID }}'
+
+
+
+
+
+
+
+
+    # - name: Retrieve z/OS proclib dataset
+    #   shell: pproc
+    #   register: proclib_ds
+
+    # - name: Get ADCD PROCLIB dataset name
+    #   set_fact: 
+    #     adcd_proclib: '{{item}}'
+    #   when: '"ADCD" in item'
+    #   with_items: '{{proclib_ds.stdout_lines}}'
+
+    # - debug:
+    #     var: adcd_proclib
+
+    # # Query IMS-managed ACB status
+    # - name: Query IMS-managed ACB status
+    #   ims_command:
+    #     # command: QUERY MEMBER TYPE(IMS) SHOW(ATTRIB)
+    #     plex:  '{{ DFS_IMSPlex }}'
+    #   register: macb_status
+    #   #ignore_errors: true
+
+    # - name: IMS attributes are {{macb_status.ims_output[0].type_2_response[0].LclAttr}}
+    #   debug: 
+    #     msg: '{{macb_status}}'
 
     # # Query RM status
     # - name: Query RM status
@@ -436,7 +515,7 @@
     #   # JOB_CARD will be the default job card inserted for dynamically generated JCL
     #   # ensure MSGCLASS and CLASS are correct for desired environment
     # - set_fact:
-    #     ZOS_RELEASE: '{{proclib_ds.stdout[5:9]}}'
+    #     ZOS_RELEASE: '{{adcd_proclib[5:9]}}'
 
     # Configure TLS port for IMS ODBM
     # - include_role:
@@ -488,9 +567,9 @@
     #       ADDTL_SAMP_PROC_LIB: '{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_AUTH_LIB_HLQ2 }}.PROCLIB'
     #       TCPIP_PROFILE_TMP: '{{ DFS_AUTH_LIB_HLQ1 }}.TEMP'
     #       ROUTE: '{{ DFS_IMS_SSID }}'
-    #       ZOS_RELEASE: '{{proclib_ds.stdout[5:9]}}'
-    #       DFS_DS_VOLUME1: '{{proclib_ds.stdout[8]}}{{proclib_ds.stdout[7]}}USR1'
-    #       DFS_DS_VOLUME2: '{{proclib_ds.stdout[8]}}{{proclib_ds.stdout[7]}}USR1'
+    #       ZOS_RELEASE: '{{adcd_proclib[5:9]}}'
+    #       DFS_DS_VOLUME1: '{{adcd_proclib[8]}}{{adcd_proclib[7]}}USR1'
+    #       DFS_DS_VOLUME2: '{{adcd_proclib[8]}}{{adcd_proclib[7]}}USR1'
     #       DFS_AUTH_LIB_SYSHLQ: "{% if DFS_AUTH_LIB_SYSHLQ2 %}{{DFS_AUTH_LIB_SYSHLQ1}}.{{DFS_AUTH_LIB_SYSHLQ2}}{% else %}{{DFS_AUTH_LIB_SYSHLQ1}}{% endif %}"
 
     # - debug:
