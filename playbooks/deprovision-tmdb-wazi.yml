@@ -25,7 +25,7 @@
           name: '{{ ansible_operator_meta.name }}'
           namespace: '{{ ansible_operator_meta.namespace }}'
       register: tmdb_cr_instance
-      delegate_to: 127.0.0.1
+      delegate_to: localhost
 
     - debug:
         var: tmdb_cr_instance.resources[0].status.run_result
@@ -36,7 +36,7 @@
             - name: No provisioning status found. Exiting....
               meta: end_host
           when: 
-            - tmdb_cr_instance.resources[0].status.run_result is not defined 
+            - tmdb_cr_instance.resources[0].status.run_result is undefined
             # - tmdb_cr_instance.resources[0].status.run_result == 'failedInputValidation'
             # - k8s_managed
 

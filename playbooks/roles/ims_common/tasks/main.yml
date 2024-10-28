@@ -71,7 +71,8 @@
           - active_ctl_msg is defined 
           - '"EMERGENCY BACKUP OR OVERRIDE" in active_ctl_msg | join'
 
-      - wait_for:
+      - name: Wait 10s for previous IMS command to complete
+        wait_for:
           timeout: 10
 
       - name: Issue /DIS ACT command
@@ -91,7 +92,8 @@
           - display_result.msg is defined 
           - '"Success" not in display_result.msg | join'
 
-      - wait_for:
+      - name: Wait 10s for previous IMS command to complete
+        wait_for:
           timeout: 10
           
       - name: Issue /DIS ACT command

@@ -53,7 +53,7 @@
               name: update_instance_status
             vars:
               status_key: 'run_result'
-              status_val: 'Provisioning in progress...'
+              status_val: 'Provisioning in progress for {{DFS_Note}}...'
               instance_kind: TMDB
 
           - name: send all templates to host
@@ -84,7 +84,6 @@
               status_key: 'run_result'
               status_val: 'Provisioning in progress...'
               instance_kind: TMDB
-            # when: tmdb_cr_instance.resources[0].status.run_result is not defined
 
           - name: send all templates to host
             include_role:
