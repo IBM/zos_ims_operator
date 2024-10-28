@@ -434,7 +434,7 @@
     #   zos_job_query:
     #     job_name: "IMWYHWS"
     #   register: qry_result
-    #     # failed_when: qry_result.msg is not defined
+    #     # failed_when: qry_result.msg is undefined
     # - debug:
     #     msg: '{{ qry_result }}'
 
@@ -541,7 +541,7 @@
         #     command: QUERY IMSPLEX
         #     plex:  PLXWX
         #   register: qry_result
-        #   failed_when: qry_result.msg is not defined
+        #   failed_when: qry_result.msg is undefined
         # - debug:
         #     msg: '{{ qry_result }}'
         # # - name: Check if IMSPLEX PLXWZ already Up

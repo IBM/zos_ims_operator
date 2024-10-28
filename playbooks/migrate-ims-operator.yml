@@ -1,0 +1,96 @@
+---
+#
+# Copyright 2024 IBM Inc. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+- name: Migrate existing TMDB instances to match a new IMS Operator version
+  hosts: all
+  gather_facts: false
+  # * Include different variable files depending on environment/inventory used
+  vars_files:
+    - vars_wazi/instance-migration.yml
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  collections:
+    # - ibm.ibm_zos_core
+    # - ibm.ibm_zos_ims
+    - operator_sdk.util
+
+  tasks:
+      - name: Retrieve migration ConfigMap
+        delegate_to: localhost
+        kubernetes.core.k8s_info:
+          api_version: v1
+          kind: ConfigMap
+          namespace: "{{ ansible_operator_meta.namespace }}"
+          name: "ims-operators-migration"
+        register: ims_migration_configmap
+
+      - name: End if migration has already been applied
+        ansible.builtin.meta: end_play
+        when: ims_migration_configmap.resources | length > 0
+
+      - name: Execute migration if not already applied
+        block:
+          - name: Define list of CRs to migrate
+            ansible.builtin.set_fact:
+                crs_to_migrate: []
+
+          - name: Gather existing CRs for all TMDBs
+            ansible.builtin.include_role:
+              name: gather_tmdb_instances
+            loop: "{{ kinds | product(api_versions) | list }}"  # Nested loop, iterates all versions for each kind
+
+          - debug:
+              msg: "{{crs_to_migrate | length }} CRs to migrate"
+
+          - name: Migrate TMDB instances
+            ansible.builtin.include_role:
+              name: create_tmdb_instances
+            loop: "{{ crs_to_migrate }}"
+
+          # Remove uninstall playbook from the finalizer before deleting the instance 
+          # so uninstall doesn't get invoked during migration
+          - name: Remove finalizer for existing TMDB instances
+            kubernetes.core.k8s:
+              state: patched
+              api_version: "{{ item.apiVersion }}"
+              kind: "{{ item.kind }}"
+              namespace: "{{ item.metadata.namespace }}"
+              name: "{{ item.metadata.name }}"
+              definition:
+                metadata:
+                  finalizers: []
+            loop: "{{ crs_to_migrate }}"
+            delegate_to: localhost
+
+          - name: Clean up existing TMDB instances
+            kubernetes.core.k8s:
+              state: absent
+              api_version: "{{ item.apiVersion }}"
+              kind: "{{ item.kind }}"
+              namespace: "{{ item.metadata.namespace }}"
+              name: "{{ item.metadata.name }}"
+            loop: "{{ crs_to_migrate }}"
+            delegate_to: localhost
+
+          - name: Create ConfigMap with migration status
+            delegate_to: localhost
+            k8s:
+              state: present
+              api_version: v1
+              kind: ConfigMap
+              namespace: "{{ ansible_operator_meta.namespace }}"
+              name: "ims-operators-migration"
+              definition:
+                data:
+                  migrated: "true"
+                  migration_date: "{{ '%Y-%m-%dT%H:%M:%S%z' | strftime }}"
+                  migrated_crs_total: "{{ crs_to_migrate | length }}"
+                  migrated_crs_list: "{{ crs_to_migrate | string }}"
+
+          - name: IMS CRs migrated successfully
+            ansible.builtin.debug:
+              msg: IMS CRs migrated successfully
+        when: ims_migration_configmap.resources | length == 0

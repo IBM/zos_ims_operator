@@ -23,7 +23,7 @@
         name: '{{ ansible_operator_meta.name }}'
         namespace: '{{ ansible_operator_meta.namespace }}'
     register: tmdb_cr_instance
-    delegate_to: 127.0.0.1
+    delegate_to: localhost
 
   - debug:
       var: tmdb_cr_instance
@@ -32,6 +32,7 @@
     set_fact:
       DFS_IMS_SSID: '{{tmdb_cr_instance.resources[0].spec.DFS_IMS_SSID}}'
       DFS_IMSPlex: '{{tmdb_cr_instance.resources[0].spec.DFS_IMSPlex}}'
+      DFS_workingdir: '{{tmdb_cr_instance.resources[0].spec.DFS_workingdir}}'
       ODBM_PORTID: "{{ tmdb_cr_instance.resources[0].spec.ODBM_PORTID }}"
       ODBM_SSLPORTID: "{{ tmdb_cr_instance.resources[0].spec.ODBM_SSLPORTID }}"
       IMS_CONNECT_PORT: "{{ tmdb_cr_instance.resources[0].spec.IMS_CONNECT_PORT }}"
@@ -118,6 +119,48 @@
         - '{{zCloud_CSSLIB}}'
         - "{{ tmdb_cr_instance.resources[0].spec.Optional_zOS_Configuration.zCloud_CSSLIB }}"
 
+  - name: Retrieve instance_status ConfigMap
+    delegate_to: localhost
+    kubernetes.core.k8s_info:
+      api_version: v1
+      kind: ConfigMap
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      name: "{{ansible_operator_meta.name}}"
+    register: instance_status_configmap
+
+  - debug:
+      var: instance_status_configmap
+
+  - name: Update run_result from ConfigMap if exist
+    include_role:
+      name: update_instance_status
+    vars:
+      status_key: 'run_result'
+      status_val: "{{instance_status_configmap.resources[0].data.run_status}}"
+      instance_kind: TMDB
+    when: instance_status_configmap.resources | length > 0  
+
+  - name: Retrieve the TMDB instance for {{ k8s_cr_event }} event
+    k8s_info:
+        api_version: '{{ k8s_cr_version }}'
+        kind: TMDB
+        name: '{{ ansible_operator_meta.name }}'
+        namespace: '{{ ansible_operator_meta.namespace }}'
+    register: tmdb_cr_instance
+    delegate_to: localhost
+    
+  - debug:
+      var: tmdb_cr_instance
+
+  - name: Delete instance_status ConfigMap
+    delegate_to: localhost
+    kubernetes.core.k8s:
+      state: absent
+      api_version: v1
+      kind: ConfigMap
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      name: "{{ansible_operator_meta.name}}"
+
   - name: This run is due to reconcile
     set_fact:
       reconcile_run: true
@@ -164,7 +207,7 @@
 
 - set_fact: 
     DFS_DS_VOLUME1: '{{adcd_proclib[8]}}{{adcd_proclib[7]}}USR1'
-  when: tmdb_cr_instance.resources[0].spec.Optional_IMS_Configuration.DFS_DS_VOLUME1 is not defined
+  when: tmdb_cr_instance.resources[0].spec.Optional_IMS_Configuration.DFS_DS_VOLUME1 is undefined
 
 - set_fact:
     system_environment: '{{ system_environment | combine(new_item, recursive=true) }}'
@@ -178,12 +221,12 @@
     tempfile:
       state: directory
     register: this_tmp_dir
-    when: tmdb_cr_instance.resources[0].status.templates_path is not defined
+    when: tmdb_cr_instance.resources[0].status.templates_path is undefined
 
   - name: Set temporary directory to store templates
     set_fact:
       tmdb_tmp_dir: '{{this_tmp_dir.path}}'
-    when: tmdb_cr_instance.resources[0].status.templates_path is not defined
+    when: tmdb_cr_instance.resources[0].status.templates_path is undefined
 
   - name: Overwrite template path with existing one for reconcile run
     set_fact:

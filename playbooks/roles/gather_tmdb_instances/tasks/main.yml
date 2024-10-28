@@ -1,0 +1,19 @@
+---
+#
+# Copyright 2024 IBM Inc. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+- name: Gather TMDB instances
+      
+  block:
+    - name: "Reading resources for {{ item }}"
+      delegate_to: localhost
+      k8s_info:
+        api_version: "{{ item[1] }}"
+        kind: "{{ item[0] }}"
+        namespace: '{{ ansible_operator_meta.namespace }}'
+      register: existing_crs
+
+    - name: Update CRs to migrate list
+      ansible.builtin.set_fact:
+        crs_to_migrate: "{{ crs_to_migrate + existing_crs.resources }}"
