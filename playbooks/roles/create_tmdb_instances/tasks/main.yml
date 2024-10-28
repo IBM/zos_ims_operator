@@ -1,0 +1,33 @@
+---
+#
+# Copyright 2024 IBM Inc. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+- name: Create new a TMDB instance to match the installed operator
+      
+  block:
+
+    - name: Create a new TMDB instance 
+      delegate_to: localhost
+      k8s:
+        state: present
+        api_version: "{{ k8s_cr_version }}"
+        kind: TMDB
+        namespace: "{{ ansible_operator_meta.namespace }}"
+        name: "{{ item.kind | lower }}-{{ item.metadata.name }}-migrated"
+        definition:
+          spec: "{{item.spec | combine({'accept': omit }) }}"
+      when: item.kind is search('TMDB')
+
+    - name: Create ConfigMap to track instance run_status
+      delegate_to: localhost
+      k8s:
+        state: present
+        api_version: v1
+        kind: ConfigMap
+        namespace: "{{ ansible_operator_meta.namespace }}"
+        name: "{{ item.kind | lower }}-{{ item.metadata.name }}-migrated"
+        definition:
+          data:
+            run_status: "{{item.status.run_result}}"
+      when: item.kind is search('TMDB') and item.status.run_result is defined

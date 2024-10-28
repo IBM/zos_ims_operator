@@ -1,0 +1,4 @@
+api_versions:
+  - "suboperator.zoscb.ibm.com/v1minor2patch0"
+kinds:
+  - TMDB
